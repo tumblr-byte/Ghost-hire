@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Ghost Hunt - Find Teammates{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hunt-container {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 2rem;
+    }
+    
+    .developer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .dev-card {
+        background: rgba(157, 78, 221, 0.05);
+        border: 2px solid var(--neon-purple);
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .dev-card:hover {
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.4);
+        transform: translateY(-10px);
+    }
+    
+    .dev-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 3px solid var(--neon-green);
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+        margin-bottom: 1rem;
+    }
+    
+    .skill-badge {
+        display: inline-block;
+        background: var(--neon-purple);
+        color: var(--bg-black);
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        margin: 3px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hunt-container">
+    <h1 style="text-align: center; font-size: 3.5rem; animation: flicker 3s infinite; margin-bottom: 1rem;">
+        🔍 Ghost Hunt 🔍
+    </h1>
+    <p style="text-align: center; font-size: 1.3rem; color: var(--neon-green); margin-bottom: 3rem;">
+        Find developers to join your crew! 👻
+    </p>
+    
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'ghost_hunt' %}" style="max-width: 600px; margin: 0 auto 3rem auto;">
+        <div style="display: flex; gap: 1rem;">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="🔍 Search by ghost_id or username..." 
+                value="{{ search_query }}"
+                style="flex: 1; padding: 15px 20px; font-size: 1.1rem; background: rgba(157, 78, 221, 0.1); border: 2px solid var(--neon-purple); color: var(--neon-green); border-radius: 10px;"
+            >
+            <button type="submit" class="haunted-button" style="padding: 15px 30px; font-size: 1.1rem;">
+                🔍 Hunt
+            </button>
+        </div>
+    </form>
+    
+    {% if developers %}
+    <div class="developer-grid">
+        {% for dev in developers %}
+        <div class="dev-card">
+            {% if dev.ghost_avatar %}
+                <img src="{{ dev.ghost_avatar.url }}" alt="{{ dev.username }}" class="dev-avatar">
+            {% endif %}
+            
+            <h3 style="color: var(--neon-green); font-size: 1.5rem; margin-bottom: 0.5rem;">{{ dev.username }}</h3>
+            
+            {% if dev.is_verified %}
+                <span style="color: var(--neon-green); font-size: 0.9rem;">✅ Verified Ghost</span>
+            {% endif %}
+            
+            <p style="color: var(--text-gray); margin: 1rem 0; min-height: 60px;">
+                {{ dev.bio|default:"No bio yet"|truncatewords:15 }}
+            </p>
+            
+            {% if dev.portfolio_data.github.skills %}
+            <div style="margin: 1rem 0;">
+                {% for skill in dev.portfolio_data.github.skills|slice:":5" %}
+                    <span class="skill-badge">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div style="margin: 1.5rem 0; display: flex; justify-content: space-around; font-size: 0.9rem; color: var(--text-gray);">
+                <div>
+                    <strong style="color: var(--neon-purple);">{{ dev.portfolio_data.github.public_repos|default:"0" }}</strong><br>
+                    Repos
+                </div>
+                <div>
+                    <strong style="color: var(--neon-purple);">{{ dev.portfolio_data.github.total_stars|default:"0" }}</strong><br>
+                    Stars
+                </div>
+                <div>
+                    <strong style="color: var(--neon-purple);">{{ dev.ghost_level }}</strong><br>
+                    Level
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                <a href="{% url 'haunted_portfolio_public' dev.username %}" class="haunted-button" style="text-decoration: none; flex: 1; font-size: 0.9rem; padding: 10px;">
+                    👻 View
+                </a>
+                <a href="{% url 'send_crew_invitation' dev.id %}" class="haunted-button" style="text-decoration: none; flex: 1; font-size: 0.9rem; padding: 10px;">
+                    ✉️ Invite
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p style="text-align: center; color: var(--text-gray); font-size: 1.2rem; margin: 3rem 0;">
+            No developers found. Check back later! 👻
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

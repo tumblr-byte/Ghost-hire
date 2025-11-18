@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ crew.name }} - Ghost Crew{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+    
+    .chat-header {
+        background: rgba(157, 78, 221, 0.05);
+        border: 2px solid var(--neon-purple);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .members-row {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .member-avatar {
+        text-align: center;
+    }
+    
+    .member-avatar img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid var(--neon-green);
+    }
+    
+    .chat-messages {
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid var(--neon-green);
+        padding: 2rem;
+        min-height: 400px;
+        max-height: 600px;
+        overflow-y: auto;
+        margin-bottom: 2rem;
+    }
+    
+    .message-item {
+        background: rgba(157, 78, 221, 0.1);
+        border-left: 3px solid var(--neon-purple);
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .message-item.code-message {
+        background: rgba(57, 255, 20, 0.05);
+        border-left: 3px solid var(--neon-green);
+    }
+    
+    .message-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--neon-green);
+        margin-right: 1rem;
+    }
+    
+    .message-code {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--neon-green);
+        padding: 1rem;
+        margin-top: 0.5rem;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+        color: var(--neon-green);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Crew Header -->
+    <div class="chat-header">
+        <h1 style="color: var(--neon-green); font-size: 2.5rem; margin-bottom: 1rem;">
+            👻 {{ crew.name }}
+        </h1>
+        
+        {% if crew.crew_bio %}
+        <p style="color: var(--text-gray); margin-bottom: 1.5rem;">{{ crew.crew_bio }}</p>
+        {% endif %}
+        
+        <div style="margin-bottom: 1rem;">
+            <span style="color: var(--neon-purple); font-weight: bold;">Created by:</span>
+            <span style="color: var(--neon-green);">{{ crew.created_by.username }}</span>
+            {% if is_creator %}
+                <span style="background: var(--neon-purple); color: var(--bg-black); padding: 3px 10px; border-radius: 10px; margin-left: 10px; font-size: 0.85rem;">
+                    👑 You
+                </span>
+            {% endif %}
+        </div>
+        
+        <div>
+            <strong style="color: var(--neon-purple);">Members ({{ crew.members.count }}/5):</strong>
+            <div class="members-row">
+                {% for member in crew.members.all %}
+                <div class="member-avatar">
+                    {% if member.ghost_avatar %}
+                        <img src="{{ member.ghost_avatar.url }}" alt="{{ member.username }}">
+                    {% endif %}
+                    <p style="font-size: 0.85rem; color: var(--text-gray); margin-top: 0.5rem;">
+                        {{ member.username }}
+                        {% if member == crew.created_by %}👑{% endif %}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        {% if is_creator and not crew.is_full %}
+        <div style="margin-top: 1.5rem;">
+            <a href="{% url 'ghost_hunt' %}" class="haunted-button" style="text-decoration: none; display: inline-block;">
+                ➕ Invite More Members
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Chat Messages -->
+    <div class="chat-messages">
+        {% if messages_list %}
+            {% for msg in messages_list %}
+            <div class="message-item {% if msg.is_code %}code-message{% endif %}">
+                <div class="message-header">
+                    {% if msg.sender.ghost_avatar %}
+                        <img src="{{ msg.sender.ghost_avatar.url }}" alt="{{ msg.sender.username }}" class="message-avatar">
+                    {% endif %}
+                    <div>
+                        <strong style="color: var(--neon-green);">{{ msg.sender.username }}</strong>
+                        <span style="color: var(--text-gray); font-size: 0.85rem; margin-left: 1rem;">
+                            {{ msg.sent_at|timesince }} ago
+                        </span>
+                    </div>
+                </div>
+                
+                {% if msg.is_code %}
+                <div class="message-code">
+                    <pre>{{ msg.message }}</pre>
+                </div>
+                {% else %}
+                <p style="color: var(--text-gray); margin-top: 0.5rem; line-height: 1.6;">{{ msg.message }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: var(--text-gray); padding: 3rem;">
+                👻 No messages yet. Start the conversation!
+            </p>
+        {% endif %}
+    </div>
+    
+    <!-- Message Form -->
+    <form method="post" action="{% url 'send_crew_message' crew.id %}" 
+          style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 1rem;">
+            <textarea name="message" required placeholder="Type your message..." 
+                      rows="4" style="width: 100%; padding: 12px; font-size: 1rem;"></textarea>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="display: flex; align-items: center; color: var(--neon-green);">
+                <input type="checkbox" name="is_code" style="margin-right: 10px; width: 20px; height: 20px;">
+                💻 This is code
+            </label>
+            
+            <button type="submit" class="haunted-button">
+                👻 Send Message
+            </button>
+        </div>
+    </form>
+    
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'my_crews' %}" style="color: var(--neon-purple); text-decoration: none; font-size: 1.1rem;">
+            ← Back to My Crews
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Company Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 3rem;
+        color: #39FF14;
+        text-shadow: 0 0 20px #39FF14;
+        margin-bottom: 10px;
+    }
+    
+    .quick-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+    
+    .action-btn {
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .action-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+    }
+    
+    .section {
+        margin-bottom: 50px;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .section-header h2 {
+        color: #9D4EDD;
+        font-size: 2rem;
+        margin: 0;
+    }
+    
+    .section-count {
+        background: #9D4EDD;
+        color: #0D0D0D;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+    
+    .opportunities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 25px;
+    }
+    
+    .opportunity-card {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 25px;
+        transition: all 0.3s;
+    }
+    
+    .opportunity-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(157, 78, 221, 0.5);
+    }
+    
+    .opp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+    
+    .opp-title {
+        color: #39FF14;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+    
+    .type-badge {
+        font-size: 2rem;
+    }
+    
+    .opp-desc {
+        color: #E0E0E0;
+        margin: 15px 0;
+        line-height: 1.6;
+    }
+    
+    .opp-stats {
+        display: flex;
+        gap: 20px;
+        margin: 15px 0;
+        padding: 15px 0;
+        border-top: 1px solid #9D4EDD;
+    }
+    
+    .stat {
+        text-align: center;
+    }
+    
+    .stat-value {
+        color: #39FF14;
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: block;
+    }
+    
+    .stat-label {
+        color: #E0E0E0;
+        font-size: 0.8rem;
+    }
+    
+    .invitations-table {
+        width: 100%;
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .invitations-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .invitations-table th {
+        background: #9D4EDD;
+        color: #0D0D0D;
+        padding: 15px;
+        text-align: left;
+        font-weight: bold;
+    }
+    
+    .invitations-table td {
+        padding: 15px;
+        border-bottom: 1px solid #9D4EDD;
+        color: #E0E0E0;
+    }
+    
+    .invitations-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .invitations-table tr:hover {
+        background: #0D0D0D;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+    
+    .status-pending {
+        background: #FFA500;
+        color: #0D0D0D;
+    }
+    
+    .status-accepted {
+        background: #39FF14;
+        color: #0D0D0D;
+    }
+    
+    .status-declined {
+        background: #FF4444;
+        color: white;
+    }
+    
+    .submission-card {
+        background: #1A1A1A;
+        border: 2px solid #39FF14;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+    
+    .submission-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 40px rgba(57, 255, 20, 0.5);
+    }
+    
+    .submission-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .developer-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .dev-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid #39FF14;
+    }
+    
+    .dev-name {
+        color: #39FF14;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .rate-btn {
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .rate-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #1A1A1A;
+        border: 2px dashed #9D4EDD;
+        border-radius: 15px;
+    }
+    
+    .empty-state h3 {
+        color: #9D4EDD;
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #E0E0E0;
+    }
+</style>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>🏢 Company Dashboard</h1>
+        <p style="color: #E0E0E0;">Manage your opportunities and invitations</p>
+    </div>
+    
+    <div class="quick-actions">
+        <a href="{% url 'ghost_selector' %}" class="action-btn">
+            👻 Browse Developers
+        </a>
+        <a href="{% url 'create_opportunity' %}" class="action-btn">
+            ✨ Create Opportunity
+        </a>
+    </div>
+    
+    <!-- Pending Submissions to Review -->
+    {% if pending_submissions %}
+    <div class="section">
+        <div class="section-header">
+            <h2>⭐ Submissions to Review</h2>
+            <span class="section-count">{{ pending_submissions.count }}</span>
+        </div>
+        
+        {% for submission in pending_submissions %}
+        <div class="submission-card">
+            <div class="submission-header">
+                <div class="developer-info">
+                    <img src="{{ submission.invitation.developer.ghost_avatar.url }}" alt="{{ submission.invitation.developer.username }}" class="dev-avatar">
+                    <div>
+                        <div class="dev-name">{{ submission.invitation.developer.username }}</div>
+                        <div style="color: #9D4EDD; font-size: 0.9rem;">{{ submission.invitation.opportunity.title }}</div>
+                    </div>
+                </div>
+                <a href="{% url 'rate_submission' submission.id %}" class="rate-btn">
+                    ⭐ Rate Submission
+                </a>
+            </div>
+            <p style="color: #E0E0E0; margin: 10px 0;">
+                Submitted: {{ submission.submitted_at|date:"M d, Y H:i" }}
+            </p>
+            {% if submission.github_link %}
+            <p style="color: #39FF14;">
+                🔗 <a href="{{ submission.github_link }}" target="_blank" style="color: #39FF14;">View GitHub</a>
+            </p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- My Opportunities -->
+    <div class="section">
+        <div class="section-header">
+            <h2>💼 My Opportunities</h2>
+            <span class="section-count">{{ opportunities.count }}</span>
+        </div>
+        
+        <div class="opportunities-grid">
+            {% for opp in opportunities %}
+            <div class="opportunity-card">
+                <div class="opp-header">
+                    <h3 class="opp-title">{{ opp.title }}</h3>
+                    <span class="type-badge">
+                        {% if opp.opportunity_type == 'paid_trial' %}💰
+                        {% elif opp.opportunity_type == 'internship' %}🎓
+                        {% else %}⭐{% endif %}
+                    </span>
+                </div>
+                
+                <p class="opp-desc">{{ opp.description|truncatewords:20 }}</p>
+                
+                <div class="opp-stats">
+                    <div class="stat">
+                        <span class="stat-value">{{ opp.invitation_count }}</span>
+                        <span class="stat-label">Invited</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{ opp.accepted_count }}</span>
+                        <span class="stat-label">Accepted</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{ opp.submission_count }}</span>
+                        <span class="stat-label">Submissions</span>
+                    </div>
+                </div>
+                
+                <p style="color: #9D4EDD; font-size: 0.9rem; margin-top: 10px;">
+                    Created: {{ opp.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <h3>💼 No Opportunities Yet</h3>
+                <p>Create your first opportunity to start inviting developers!</p>
+                <a href="{% url 'create_opportunity' %}" class="action-btn" style="display: inline-block; margin-top: 20px;">
+                    ✨ Create Opportunity
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- All Invitations -->
+    <div class="section">
+        <div class="section-header">
+            <h2>📨 All Invitations</h2>
+            <span class="section-count">{{ invitations.count }}</span>
+        </div>
+        
+        {% if invitations %}
+        <div class="invitations-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Developer</th>
+                        <th>Opportunity</th>
+                        <th>Status</th>
+                        <th>Sent</th>
+                        <th>Responded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inv in invitations %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'haunted_portfolio_public' inv.developer.username %}" target="_blank" style="color: #39FF14;">
+                                {{ inv.developer.username }}
+                            </a>
+                        </td>
+                        <td>{{ inv.opportunity.title }}</td>
+                        <td>
+                            <span class="status-badge status-{{ inv.status }}">
+                                {% if inv.status == 'pending' %}⏳ Pending
+                                {% elif inv.status == 'accepted' %}✅ Accepted
+                                {% else %}❌ Declined{% endif %}
+                            </span>
+                        </td>
+                        <td>{{ inv.sent_at|date:"M d, Y" }}</td>
+                        <td>
+                            {% if inv.responded_at %}
+                                {{ inv.responded_at|date:"M d, Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>📨 No Invitations Sent Yet</h3>
+            <p>Browse developers and send your first invitation!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

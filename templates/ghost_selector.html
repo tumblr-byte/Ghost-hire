@@ -1,0 +1,485 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ghost Selector - Find Your Perfect Developer{% endblock %}
+
+{% block content %}
+<style>
+    .ghost-selector-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .selector-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .selector-header h1 {
+        font-size: 3rem;
+        color: #39FF14;
+        text-shadow: 0 0 20px #39FF14;
+        margin-bottom: 10px;
+    }
+    
+    .selector-header p {
+        color: #E0E0E0;
+        font-size: 1.2rem;
+    }
+    
+    /* Filters Section */
+    .filters-section {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .filter-group label {
+        color: #9D4EDD;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+    }
+    
+    .filter-group input, .filter-group select {
+        width: 100%;
+        padding: 10px;
+        background: #0D0D0D;
+        border: 1px solid #9D4EDD;
+        border-radius: 8px;
+        color: #E0E0E0;
+    }
+    
+    .filter-btn {
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .filter-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+    }
+    
+    /* Shortlist Panel */
+    .shortlist-panel {
+        position: fixed;
+        right: 20px;
+        top: 100px;
+        width: 300px;
+        background: #1A1A1A;
+        border: 2px solid #39FF14;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+        max-height: 70vh;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+    
+    .shortlist-header {
+        color: #39FF14;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .shortlist-count {
+        background: #39FF14;
+        color: #0D0D0D;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+    
+    .shortlist-item {
+        background: #0D0D0D;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .shortlist-item span {
+        color: #E0E0E0;
+    }
+    
+    .remove-btn {
+        background: #FF4444;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+    
+    .create-opportunity-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: all 0.3s;
+    }
+    
+    .create-opportunity-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+    }
+    
+    /* Developer Cards Grid */
+    .developers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        margin-right: 340px;
+    }
+    
+    .developer-card {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 25px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .developer-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(157, 78, 221, 0.5);
+        border-color: #39FF14;
+    }
+    
+    .developer-card::before {
+        content: '👻';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        font-size: 5rem;
+        opacity: 0.1;
+    }
+    
+    .dev-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .dev-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid #39FF14;
+        margin-right: 15px;
+        object-fit: cover;
+    }
+    
+    .dev-info h3 {
+        color: #39FF14;
+        margin: 0 0 5px 0;
+        font-size: 1.3rem;
+    }
+    
+    .dev-info p {
+        color: #9D4EDD;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .ghost-level {
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 5px;
+    }
+    
+    .dev-skills {
+        margin: 15px 0;
+    }
+    
+    .skill-tag {
+        display: inline-block;
+        background: #0D0D0D;
+        color: #39FF14;
+        padding: 5px 12px;
+        border-radius: 15px;
+        margin: 5px 5px 5px 0;
+        font-size: 0.85rem;
+        border: 1px solid #39FF14;
+    }
+    
+    .dev-stats {
+        display: flex;
+        justify-content: space-around;
+        margin: 15px 0;
+        padding: 15px 0;
+        border-top: 1px solid #9D4EDD;
+        border-bottom: 1px solid #9D4EDD;
+    }
+    
+    .stat {
+        text-align: center;
+    }
+    
+    .stat-value {
+        color: #39FF14;
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: block;
+    }
+    
+    .stat-label {
+        color: #E0E0E0;
+        font-size: 0.8rem;
+    }
+    
+    .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .view-profile-btn {
+        flex: 1;
+        background: #0D0D0D;
+        color: #9D4EDD;
+        border: 1px solid #9D4EDD;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .view-profile-btn:hover {
+        background: #9D4EDD;
+        color: #0D0D0D;
+    }
+    
+    .add-shortlist-btn {
+        flex: 1;
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    
+    .add-shortlist-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+    }
+    
+    .pagination {
+        text-align: center;
+        margin-top: 40px;
+        color: #E0E0E0;
+    }
+    
+    .pagination a {
+        color: #9D4EDD;
+        padding: 8px 15px;
+        margin: 0 5px;
+        border: 1px solid #9D4EDD;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .pagination a:hover {
+        background: #9D4EDD;
+        color: #0D0D0D;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #E0E0E0;
+    }
+    
+    .empty-state h2 {
+        color: #9D4EDD;
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="ghost-selector-container">
+    <div class="selector-header">
+        <h1>👻 Ghost Selector</h1>
+        <p>Find and invite the perfect developers for your opportunity</p>
+    </div>
+    
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <form method="GET" action="{% url 'ghost_selector' %}">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>🎯 Skills</label>
+                    <input type="text" name="skills" placeholder="Python, React, Django..." value="{{ request.GET.skills }}">
+                </div>
+                
+                <div class="filter-group">
+                    <label>👻 Min Ghost Level</label>
+                    <input type="number" name="min_ghost_level" min="1" max="10" placeholder="1-10" value="{{ request.GET.min_ghost_level }}">
+                </div>
+                
+                <div class="filter-group">
+                    <label>✨ Min Code Authenticity %</label>
+                    <input type="number" name="min_authenticity" min="0" max="100" placeholder="0-100" value="{{ request.GET.min_authenticity }}">
+                </div>
+                
+                <div class="filter-group" style="display: flex; align-items: flex-end;">
+                    <button type="submit" class="filter-btn">🔍 Filter Ghosts</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Shortlist Panel (Fixed) -->
+    <div class="shortlist-panel">
+        <div class="shortlist-header">
+            <span>📋 Shortlist</span>
+            <span class="shortlist-count">{{ shortlist_count }}</span>
+        </div>
+        
+        {% if shortlist %}
+            {% for dev in shortlist %}
+            <div class="shortlist-item">
+                <span>{{ dev.username }}</span>
+                <form method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_from_shortlist">
+                    <input type="hidden" name="developer_id" value="{{ dev.id }}">
+                    <button type="submit" class="remove-btn">✕</button>
+                </form>
+            </div>
+            {% endfor %}
+            
+            <a href="{% url 'create_opportunity' %}">
+                <button class="create-opportunity-btn">
+                    ✨ Create Opportunity & Invite
+                </button>
+            </a>
+        {% else %}
+            <p style="color: #E0E0E0; text-align: center; margin-top: 20px;">
+                No developers shortlisted yet. Add some ghosts!
+            </p>
+        {% endif %}
+    </div>
+    
+    <!-- Developers Grid -->
+    <div class="developers-grid">
+        {% for dev in developers %}
+        <div class="developer-card">
+            <div class="dev-header">
+                <img src="{{ dev.ghost_avatar.url }}" alt="{{ dev.username }}" class="dev-avatar">
+                <div class="dev-info">
+                    <h3>{{ dev.username }}</h3>
+                    <p>{{ dev.developer_role|default:"Developer" }}</p>
+                    <span class="ghost-level">👻 Level {{ dev.ghost_level }}</span>
+                </div>
+            </div>
+            
+            <div class="dev-skills">
+                {% if dev.portfolio_data.top_skills %}
+                    {% for skill in dev.portfolio_data.top_skills|slice:":3" %}
+                    <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                {% elif dev.core_skills %}
+                    {% for skill in dev.core_skills|slice:":3" %}
+                    <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">JavaScript</span>
+                    <span class="skill-tag">React</span>
+                {% endif %}
+            </div>
+            
+            <div class="dev-stats">
+                <div class="stat">
+                    <span class="stat-value">{{ dev.portfolio_data.total_projects|default:"5" }}</span>
+                    <span class="stat-label">Projects</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">{{ dev.portfolio_data.code_authenticity|default:"85" }}%</span>
+                    <span class="stat-label">Authentic</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">{{ dev.portfolio_data.total_commits|default:"120" }}</span>
+                    <span class="stat-label">Commits</span>
+                </div>
+            </div>
+            
+            <div class="card-actions">
+                <a href="{% url 'haunted_portfolio_public' dev.username %}" class="view-profile-btn" target="_blank">
+                    👁️ View Portfolio
+                </a>
+                <form method="POST" style="flex: 1;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_to_shortlist">
+                    <input type="hidden" name="developer_id" value="{{ dev.id }}">
+                    <button type="submit" class="add-shortlist-btn">
+                        ➕ Add to Shortlist
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state" style="grid-column: 1 / -1;">
+            <h2>👻 No Ghosts Found</h2>
+            <p>Try adjusting your filters to find more developers</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if developers.has_other_pages %}
+    <div class="pagination">
+        {% if developers.has_previous %}
+            <a href="?page={{ developers.previous_page_number }}">← Previous</a>
+        {% endif %}
+        
+        <span>Page {{ developers.number }} of {{ developers.paginator.num_pages }}</span>
+        
+        {% if developers.has_next %}
+            <a href="?page={{ developers.next_page_number }}">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

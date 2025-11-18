@@ -1,0 +1,1491 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }}'s Haunted Portfolio - Ghost Hire{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    /* INSANE HAUNTED EFFECTS */
+    @keyframes bloodDrip {
+        0% { transform: translateY(-100%); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateY(100vh); opacity: 0; }
+    }
+    
+    /* Removed harsh animations for better UX */
+    
+    @keyframes pulseGlow {
+        0%, 100% { filter: brightness(1) drop-shadow(0 0 10px var(--neon-green)); }
+        50% { filter: brightness(1.5) drop-shadow(0 0 30px var(--neon-green)); }
+    }
+    
+    /* Removed surprise ghost and lightning effects */
+    
+    /* Collapsible Section */
+    .collapsible-section {
+        margin: 2rem 0;
+        border: 2px solid var(--neon-purple);
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(157, 78, 221, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .collapsible-header {
+        padding: 1.5rem;
+        background: rgba(157, 78, 221, 0.1);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .collapsible-header:hover {
+        background: rgba(157, 78, 221, 0.2);
+        box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
+    }
+    
+    .collapsible-header h3 {
+        margin: 0;
+        color: var(--neon-green);
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    
+    .collapsible-icon {
+        font-size: 2rem;
+        color: var(--neon-green);
+        transition: transform 0.3s ease;
+    }
+    
+    .collapsible-section.open .collapsible-icon {
+        transform: rotate(180deg);
+    }
+    
+    .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease, padding 0.5s ease;
+        padding: 0 1.5rem;
+    }
+    
+    .collapsible-section.open .collapsible-content {
+        max-height: 5000px;
+        padding: 1.5rem;
+    }
+    
+    /* Side-by-Side Layout */
+    .side-by-side {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin: 2rem 0;
+    }
+    
+    @media (max-width: 968px) {
+        .side-by-side {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Impressive Card */
+    .impressive-card {
+        background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), rgba(57, 255, 20, 0.05));
+        border: 2px solid var(--neon-purple);
+        border-radius: 15px;
+        padding: 2rem;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .impressive-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .impressive-card:hover::before {
+        left: 100%;
+    }
+    
+    .impressive-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(57, 255, 20, 0.3);
+        border-color: var(--neon-green);
+    }
+    
+    .portfolio-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 3rem;
+        position: relative;
+    }
+    
+    /* Left Sidebar - Profile Info */
+    .profile-sidebar {
+        height: fit-content;
+    }
+    
+    .profile-card {
+        background: var(--bg-card);
+        border: 2px solid var(--accent-secondary);
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 5px 20px var(--glow-purple);
+        position: relative;
+        z-index: 100;
+    }
+    
+    .portfolio-header {
+        margin-bottom: 2rem;
+    }
+    
+    /* Right Content Area */
+    .portfolio-content {
+        min-height: 100vh;
+    }
+    
+    @media (max-width: 1024px) {
+        .portfolio-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .profile-sidebar {
+            position: relative;
+            top: 0;
+        }
+    }
+    
+    .ghost-avatar-large {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        border: 5px solid var(--neon-green);
+        /* Removed harsh animations */
+        margin-bottom: 1.5rem;
+        position: relative;
+        filter: drop-shadow(0 0 30px var(--neon-green));
+    }
+    
+    .ghost-avatar-large::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(57, 255, 20, 0.3), transparent);
+        /* Removed pulse animation */
+        z-index: -1;
+    }
+    
+    .portfolio-username {
+        font-size: 4rem;
+        color: var(--neon-purple);
+        /* Removed glitch effect */
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+        font-weight: 900;
+    }
+    
+    .verified-badge-large {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--neon-green), #00ff00);
+        color: var(--bg-black);
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-size: 1.3rem;
+        font-weight: 900;
+        margin-top: 1rem;
+        /* Removed pulse animation */
+        box-shadow: 0 0 20px var(--neon-green), 0 0 40px var(--neon-green);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
+        perspective: 1000px;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), rgba(57, 255, 20, 0.05));
+        border: 3px solid var(--neon-purple);
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.5s ease;
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(57, 255, 20, 0.1), transparent);
+        transform: rotate(45deg);
+        transition: all 0.5s ease;
+    }
+    
+    .stat-card:hover {
+        box-shadow: 0 0 50px rgba(57, 255, 20, 0.6), 
+                    0 0 100px rgba(157, 78, 221, 0.4),
+                    inset 0 0 30px rgba(57, 255, 20, 0.2);
+        transform: translateY(-15px) rotateX(5deg) rotateY(5deg) scale(1.05);
+        border-color: var(--neon-green);
+    }
+    
+    .stat-card:hover::before {
+        left: 100%;
+    }
+    
+    .stat-number {
+        font-size: 4rem;
+        color: var(--neon-green);
+        font-weight: 900;
+        font-family: var(--font-header);
+        text-shadow: 0 0 5px var(--neon-green);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stat-label {
+        font-size: 1.2rem;
+        color: var(--text-gray);
+        margin-top: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 600;
+    }
+    
+    .section-title {
+        font-size: 3rem;
+        color: var(--neon-green);
+        margin: 4rem 0 2rem 0;
+        font-family: var(--font-header);
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-weight: 900;
+        text-shadow: 2px 2px 0 var(--neon-purple),
+                     -2px -2px 0 rgba(57, 255, 20, 0.3);
+        position: relative;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+        box-shadow: 0 0 20px var(--neon-green);
+    }
+    
+    .languages-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .language-pill {
+        background: var(--neon-purple);
+        color: var(--bg-black);
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        box-shadow: 0 0 15px rgba(157, 78, 221, 0.6);
+    }
+    
+    .score-meter {
+        width: 100%;
+        height: 40px;
+        background: rgba(157, 78, 221, 0.1);
+        border: 2px solid var(--neon-purple);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .score-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
+        transition: width 2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 15px;
+        color: var(--bg-black);
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .social-link {
+        display: inline-block;
+        padding: 15px 30px;
+        background: rgba(57, 255, 20, 0.1);
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+        text-decoration: none;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .social-link:hover {
+        box-shadow: 0 0 20px var(--neon-green);
+        transform: translateY(-3px);
+    }
+    
+    .no-data {
+        text-align: center;
+        color: var(--text-gray);
+        font-size: 1.2rem;
+        padding: 3rem;
+        font-style: italic;
+    }
+    
+    .ai-analysis-card {
+        background: rgba(157, 78, 221, 0.05);
+        border: 2px solid var(--neon-purple);
+        padding: 2rem;
+        margin: 2rem 0;
+        transition: all 0.3s ease;
+    }
+    
+    .ai-analysis-card:hover {
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+    }
+    
+    .code-percentage {
+        font-size: 3rem;
+        font-weight: bold;
+        font-family: var(--font-header);
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    /* Animated Skill Bars - INSANE EFFECTS */
+    .skill-bar-container {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 15px;
+        height: 40px;
+        overflow: hidden;
+        position: relative;
+        margin: 0.5rem 0;
+        border: 2px solid rgba(157, 78, 221, 0.3);
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .skill-bar-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        to { left: 100%; }
+    }
+    
+    .skill-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, 
+            var(--neon-purple), 
+            var(--neon-green), 
+            var(--neon-purple));
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease infinite;
+        border-radius: 15px;
+        transition: width 2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 15px;
+        color: #000;
+        font-weight: 900;
+        font-size: 1.1rem;
+        box-shadow: 0 0 30px var(--neon-green), 
+                    0 0 60px var(--neon-green),
+                    inset 0 0 20px rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .skill-bar-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    }
+    
+    .skill-bar-fill.animate {
+        animation: fillBar 2s ease-out forwards;
+    }
+    
+    @keyframes fillBar {
+        from { width: 0; }
+    }
+    
+    /* Speedometer Gauge - INSANE HAUNTED VERSION */
+    .speedometer {
+        width: 250px;
+        height: 250px;
+        position: relative;
+        margin: 2rem auto;
+        filter: drop-shadow(0 0 30px var(--neon-green));
+        /* Removed pulse animation */
+    }
+    
+    .speedometer-arc {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(
+            from 180deg,
+            #ff0000 0deg 72deg,
+            #ff6b35 72deg 144deg,
+            #ffc107 144deg 216deg,
+            var(--neon-green) 216deg 288deg,
+            var(--neon-purple) 288deg 360deg
+        );
+        position: relative;
+        transform: rotate(-90deg);
+        box-shadow: 0 0 40px rgba(57, 255, 20, 0.5),
+                    inset 0 0 40px rgba(0, 0, 0, 0.5);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { filter: hue-rotate(0deg); }
+        to { filter: hue-rotate(360deg); }
+    }
+    
+    .speedometer-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70%;
+        height: 70%;
+        background: radial-gradient(circle, #000, #1a1a1a);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.8),
+                    inset 0 0 30px rgba(57, 255, 20, 0.2);
+        border: 3px solid rgba(57, 255, 20, 0.3);
+    }
+    
+    .speedometer-value {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: var(--neon-green);
+        font-family: var(--font-header);
+        text-shadow: 0 0 10px var(--neon-green);
+    }
+    
+    .speedometer-label {
+        font-size: 1rem;
+        color: var(--neon-green);
+        margin-top: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-weight: 700;
+        text-shadow: 0 0 10px var(--neon-green);
+    }
+    
+    .speedometer-needle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 45%;
+        background: linear-gradient(to top, var(--neon-green), #ff0000);
+        transform-origin: bottom center;
+        transform: translate(-50%, -100%) rotate(0deg);
+        transition: transform 2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        box-shadow: 0 0 20px var(--neon-green),
+                    0 0 40px var(--neon-green);
+        border-radius: 3px;
+    }
+    
+    .speedometer-needle::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 15px;
+        height: 15px;
+        background: #ff0000;
+        border-radius: 50%;
+        box-shadow: 0 0 20px #ff0000;
+    }
+    
+    .speedometer-needle::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 20px;
+        height: 20px;
+        background: var(--neon-green);
+        border-radius: 50%;
+        box-shadow: 0 0 30px var(--neon-green);
+    }
+    
+    /* Tooltip */
+    .tooltip-trigger {
+        position: relative;
+        cursor: help;
+        display: inline-block;
+    }
+    
+    .tooltip-content {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(157, 78, 221, 0.95);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        width: 250px;
+        text-align: left;
+        z-index: 1000;
+        transition: opacity 0.3s, visibility 0.3s;
+        box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+    }
+    
+    .tooltip-trigger:hover .tooltip-content {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* Radar Chart Container */
+    .radar-chart-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        position: relative;
+    }
+    
+    /* Icon Badges */
+    .icon-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(157, 78, 221, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: 1px solid var(--neon-purple);
+        font-size: 0.9rem;
+        margin: 0.25rem;
+    }
+    
+    .icon-badge.green {
+        background: rgba(57, 255, 20, 0.1);
+        border-color: var(--neon-green);
+        color: var(--neon-green);
+    }
+    
+    /* Next Level Unlocks */
+    .unlock-card {
+        background: rgba(57, 255, 20, 0.05);
+        border-left: 4px solid var(--neon-green);
+        padding: 1.5rem;
+        margin: 1rem 0;
+        transition: all 0.3s ease;
+    }
+    
+    .unlock-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+    }
+    
+    .unlock-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+        display: inline-block;
+    }
+    
+    /* Contribution Heatmap */
+    .heatmap-container {
+        display: grid;
+        grid-template-columns: repeat(52, 1fr);
+        gap: 3px;
+        margin: 2rem 0;
+    }
+    
+    .heatmap-cell {
+        aspect-ratio: 1;
+        background: rgba(57, 255, 20, 0.1);
+        border-radius: 2px;
+        transition: all 0.2s ease;
+    }
+    
+    .heatmap-cell.level-1 { background: rgba(57, 255, 20, 0.2); }
+    .heatmap-cell.level-2 { background: rgba(57, 255, 20, 0.4); }
+    .heatmap-cell.level-3 { background: rgba(57, 255, 20, 0.6); }
+    .heatmap-cell.level-4 { background: rgba(57, 255, 20, 0.8); }
+    .heatmap-cell.level-5 { background: var(--neon-green); box-shadow: 0 0 5px var(--neon-green); }
+    
+    .heatmap-cell:hover {
+        transform: scale(1.2);
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portfolio-container">
+    <!-- LEFT SIDEBAR - Profile Info -->
+    <div class="profile-sidebar">
+        <div class="profile-card">
+            <!-- Profile Photo -->
+            {% if profile_user.ghost_avatar %}
+                <img src="{{ profile_user.ghost_avatar.url }}" alt="{{ profile_user.username }}" class="ghost-avatar-large">
+            {% endif %}
+            
+            <!-- Username & Ghost ID -->
+            <h1 class="portfolio-username" style="font-size: 2rem; margin: 1rem 0 0.5rem 0;">{{ profile_user.username }}</h1>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Ghost ID: #{{ profile_user.id }}</p>
+            
+            <!-- Verified Badge -->
+            {% if profile_user.is_verified %}
+                <span class="verified-badge-large" style="font-size: 1rem; padding: 8px 16px; margin: 1rem 0; display: inline-block;">✅ Verified</span>
+            {% endif %}
+            
+            <!-- GitHub Stats in Sidebar -->
+            {% if github_data and not github_data.error %}
+            <div style="margin-top: 2rem; text-align: left;">
+                <h3 style="color: var(--accent-primary); font-size: 1.2rem; margin-bottom: 1rem; font-family: var(--font-body);">💻 GitHub Stats</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--bg-secondary);">
+                        <span style="color: var(--text-secondary);">Public Repos</span>
+                        <span style="color: var(--accent-primary); font-weight: bold;">{{ github_data.public_repos }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--bg-secondary);">
+                        <span style="color: var(--text-secondary);">Total Stars</span>
+                        <span style="color: var(--accent-primary); font-weight: bold;">⭐ {{ github_data.total_stars }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--bg-secondary);">
+                        <span style="color: var(--text-secondary);">Followers</span>
+                        <span style="color: var(--accent-primary); font-weight: bold;">{{ github_data.followers }}</span>
+                    </div>
+
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- RIGHT CONTENT AREA -->
+    <div class="portfolio-content">
+    
+    <!-- Overall Score with Tooltip -->
+    {% if overall_score > 0 %}
+    <div style="max-width: 600px; margin: 3rem auto; text-align: center;">
+        <h2 class="section-title tooltip-trigger">
+            👻 Ghost Power Level
+            <span class="tooltip-content">
+                <strong>How it's calculated:</strong><br>
+                • GitHub repos & stars (50 pts)<br>
+                • Project complexity (20 pts)<br>
+                • Hackathon wins (20 pts)<br>
+                • Job readiness score (10 pts)
+            </span>
+        </h2>
+        <div class="speedometer">
+            <div class="speedometer-arc">
+                <div class="speedometer-needle" id="powerNeedle" style="transform: translate(-50%, -100%) rotate({{ overall_score|floatformat:0|add:'-90' }}deg);"></div>
+            </div>
+            <div class="speedometer-inner">
+                <div class="speedometer-value">{{ overall_score }}</div>
+                <div class="speedometer-label">Power Level</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- 2-Column Layout: Haunting Activity + Skills -->
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+        
+        <!-- LEFT: Haunting Activity -->
+        <div>
+            <h2 style="color: var(--accent-primary); font-size: 2rem; margin-bottom: 1.5rem; font-family: var(--font-body);">👻 Haunting Activity</h2>
+            
+            <!-- Contribution Heatmap -->
+            <div style="background: var(--bg-card); border: 2px solid var(--accent-secondary); border-radius: 15px; padding: 2rem;">
+                <h3 style="color: var(--accent-primary); font-size: 1.2rem; margin-bottom: 1.5rem; text-align: center;">Last Year Activity</h3>
+                <div class="heatmap-container"></div>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                    <span style="color: var(--text-secondary); font-size: 0.8rem;">Less</span>
+                    <div class="heatmap-cell"></div>
+                    <div class="heatmap-cell level-1"></div>
+                    <div class="heatmap-cell level-2"></div>
+                    <div class="heatmap-cell level-3"></div>
+                    <div class="heatmap-cell level-4"></div>
+                    <div class="heatmap-cell level-5"></div>
+                    <span style="color: var(--text-secondary); font-size: 0.8rem;">More</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RIGHT: Tech Stack & Skills -->
+        {% if github_data.skills %}
+        <div>
+            <h2 style="color: var(--accent-secondary); font-size: 2rem; margin-bottom: 1.5rem; font-family: var(--font-body);">🔥 Tech Stack</h2>
+            
+            <!-- Radar Chart -->
+            <div style="background: var(--bg-card); border: 2px solid var(--accent-secondary); border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem;">
+                <canvas id="skillsRadarChart" style="max-height: 250px;"></canvas>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Skills Progress Bars (Full Width, Bigger) -->
+    {% if github_data.skills %}
+    <div style="background: var(--bg-card); border: 2px solid var(--accent-secondary); border-radius: 15px; padding: 2.5rem; margin-bottom: 3rem;">
+        <h3 style="color: var(--accent-primary); font-size: 1.5rem; margin-bottom: 2rem; text-align: center;">💪 Skill Proficiency</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+            {% for skill in github_data.skills|slice:":6" %}
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                    <span style="color: var(--accent-secondary); font-weight: bold; font-size: 1.1rem;">{{ skill }}</span>
+                    <span style="color: var(--accent-primary); font-weight: bold;" class="skill-percentage-{{ forloop.counter0 }}">0%</span>
+                </div>
+                <div class="skill-bar-container" style="height: 30px;">
+                    <div class="skill-bar-fill" id="skill-bar-{{ forloop.counter0 }}" data-width="{% widthratio forloop.counter0 1 -5 as decrease %}{{ 94|add:decrease }}" style="line-height: 30px; font-size: 1rem;">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Languages Section -->
+    {% if github_data.languages %}
+    <h3 style="text-align: center; color: var(--neon-purple); font-size: 1.8rem; margin: 2rem 0;">💻 Languages Mastered</h3>
+    <div class="languages-grid">
+        {% for language, count in github_data.languages.items %}
+            <div class="language-pill">{{ language }} ({{ count }})</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Unique Projects Section -->
+    {% if github_data.unique_projects %}
+    <h3 style="text-align: center; color: var(--neon-green); font-size: 2rem; margin: 3rem 0 2rem 0;">⭐ Unique Projects</h3>
+    <div style="max-width: 900px; margin: 0 auto;">
+        {% for project in github_data.unique_projects %}
+        <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 1.5rem; transition: all 0.3s ease;" 
+             onmouseover="this.style.boxShadow='0 0 30px rgba(57, 255, 20, 0.4)'; this.style.transform='translateY(-5px)';" 
+             onmouseout="this.style.boxShadow=''; this.style.transform='';">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <h4 style="color: var(--neon-green); font-size: 1.5rem; margin: 0;">{{ project.name }}</h4>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    {% if project.stars > 0 %}
+                    <span style="color: var(--neon-green); font-size: 1.1rem;">⭐ {{ project.stars }}</span>
+                    {% endif %}
+                    {% if project.language %}
+                    <span style="background: var(--neon-purple); color: var(--bg-black); padding: 5px 12px; border-radius: 15px; font-size: 0.9rem;">
+                        {{ project.language }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <p style="color: var(--text-gray); margin-bottom: 1rem; line-height: 1.6;">{{ project.description }}</p>
+            <a href="{{ project.url }}" target="_blank" style="color: var(--neon-green); text-decoration: none; font-size: 1rem;">
+                🔗 View Project →
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- AI vs Human Code Analysis - NEW BREAKDOWN! -->
+    {% if portfolio.ai_usage_breakdown %}
+    
+    <!-- 2-Column Layout: Code Intelligence + Code Authenticity -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+        
+        <!-- LEFT: Code Intelligence Analysis -->
+        <div>
+            <h2 style="color: var(--accent-primary); font-size: 2rem; margin-bottom: 1.5rem; font-family: var(--font-body);">🤖 Code Intelligence</h2>
+            
+            <div style="background: var(--bg-card); border: 2px solid var(--accent-secondary); border-radius: 15px; padding: 2rem;">
+                {% if portfolio.ai_usage_breakdown.motivational_message %}
+                <h4 style="color: var(--accent-primary); font-size: 1.3rem; margin-bottom: 1rem;">
+                    {{ portfolio.ai_usage_breakdown.motivational_message.title }}
+                </h4>
+                <p style="color: var(--text-primary); font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                    {{ portfolio.ai_usage_breakdown.motivational_message.message }}
+                </p>
+                {% if portfolio.ai_usage_breakdown.self_awareness.score >= 60 %}
+                <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid var(--accent-primary); padding: 1rem; border-radius: 8px; text-align: center;">
+                    <span style="color: var(--accent-primary); font-weight: bold;">✅ Self-Aware Developer</span>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Score: {{ portfolio.ai_usage_breakdown.self_awareness.score }}/100</div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- RIGHT: Code Authenticity Gauge -->
+        <div>
+            <h2 style="color: var(--accent-secondary); font-size: 2rem; margin-bottom: 1.5rem; font-family: var(--font-body);">⚡ Code Authenticity</h2>
+            
+            <div style="background: var(--bg-card); border: 2px solid var(--accent-secondary); border-radius: 15px; padding: 2rem; text-align: center;">
+                <div class="speedometer">
+                    <div class="speedometer-arc">
+                        <div class="speedometer-needle" style="transform: translate(-50%, -100%) rotate({{ portfolio.ai_usage_breakdown.core_vs_supporting.core.human_percentage|floatformat:0|add:'-90' }}deg);"></div>
+                    </div>
+                    <div class="speedometer-inner">
+                        <div class="speedometer-value">{{ portfolio.ai_usage_breakdown.core_vs_supporting.core.human_percentage }}%</div>
+                        <div class="speedometer-label">Human Code</div>
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 1.5rem;">
+                    💪 You write your core algorithms yourself!
+                </p>
+            </div>
+        </div>
+    </div>
+        
+        <!-- Core vs Supporting Breakdown -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Core Skills -->
+            <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 1rem;">🔥 Core Skills</div>
+                <div style="font-size: 3rem; color: var(--neon-green); font-weight: bold; margin-bottom: 0.5rem;">
+                    {{ portfolio.ai_usage_breakdown.core_vs_supporting.core.human_percentage }}%
+                </div>
+                <div style="color: var(--text-gray); font-size: 1rem; margin-bottom: 1rem;">Human-Written</div>
+                <div class="score-meter">
+                    <div class="score-fill" style="width: {{ portfolio.ai_usage_breakdown.core_vs_supporting.core.human_percentage }}%; background: linear-gradient(90deg, #39ff14, #00ff00);"></div>
+                </div>
+                <div style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">
+                    {% for skill in portfolio.ai_usage_breakdown.core_vs_supporting.core.skills|slice:":3" %}
+                        {{ skill }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Supporting Tasks -->
+            <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 1rem;">✅ Supporting Tasks</div>
+                <div style="font-size: 3rem; color: var(--neon-purple); font-weight: bold; margin-bottom: 0.5rem;">
+                    {{ portfolio.ai_usage_breakdown.core_vs_supporting.supporting.ai_percentage }}%
+                </div>
+                <div style="color: var(--text-gray); font-size: 1rem; margin-bottom: 1rem;">AI-Assisted</div>
+                <div class="score-meter">
+                    <div class="score-fill" style="width: {{ portfolio.ai_usage_breakdown.core_vs_supporting.supporting.ai_percentage }}%; background: linear-gradient(90deg, #9d4edd, #7b2cbf);"></div>
+                </div>
+                <div style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">
+                    {% for task in portfolio.ai_usage_breakdown.core_vs_supporting.supporting.tasks|slice:":3" %}
+                        {{ task }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Category Breakdown -->
+        <h4 style="color: var(--neon-purple); font-size: 1.5rem; margin: 2rem 0 1rem 0; text-align: center;">📊 Detailed Breakdown</h4>
+        {% for card in portfolio.ai_usage_breakdown.category_cards %}
+        <div style="background: rgba({% if card.color == 'green' %}57, 255, 20{% else %}157, 78, 221{% endif %}, 0.05); border: 2px solid {% if card.color == 'green' %}var(--neon-green){% else %}var(--neon-purple){% endif %}; padding: 1.5rem; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div style="font-size: 1.3rem; color: {% if card.color == 'green' %}var(--neon-green){% else %}var(--neon-purple){% endif %}; font-weight: bold;">
+                    {{ card.icon }} {{ card.title }}
+                </div>
+                <div style="font-size: 1.5rem; color: {% if card.color == 'green' %}var(--neon-green){% else %}var(--neon-purple){% endif %}; font-weight: bold;">
+                    {{ card.human_percentage }}% Human
+                </div>
+            </div>
+            <div class="score-meter" style="margin-bottom: 1rem;">
+                <div class="score-fill" style="width: {{ card.human_percentage }}%; background: {% if card.color == 'green' %}linear-gradient(90deg, #39ff14, #00ff00){% else %}linear-gradient(90deg, #9d4edd, #7b2cbf){% endif %};"></div>
+            </div>
+            <div style="color: var(--text-gray); font-size: 0.95rem; margin-bottom: 0.5rem;">
+                Examples: {% for example in card.examples|slice:":3" %}{{ example }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            </div>
+            <div style="color: {% if card.color == 'green' %}var(--neon-green){% else %}var(--neon-purple){% endif %}; font-size: 1rem;">
+                {{ card.message }}
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Employer View -->
+        {% if portfolio.ai_usage_breakdown.employer_summary %}
+        <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem; margin-top: 2rem;">
+            <h4 style="color: var(--neon-green); font-size: 1.5rem; margin-bottom: 1rem; text-align: center;">👔 Employer View</h4>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 1.3rem; color: var(--neon-green); font-weight: bold; margin-bottom: 1rem;">
+                    "{{ portfolio.ai_usage_breakdown.employer_summary.headline }}"
+                </div>
+                <ul style="list-style: none; padding: 0; text-align: left; max-width: 600px; margin: 0 auto;">
+                    {% for point in portfolio.ai_usage_breakdown.employer_summary.key_points %}
+                    <li style="margin: 0.5rem 0; color: var(--text-gray); font-size: 1rem;">• {{ point }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Next Level Unlocks -->
+        {% if portfolio.ai_usage_breakdown.improvement_suggestions %}
+        <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem; margin-top: 2rem;">
+            <h4 style="color: var(--neon-green); font-size: 1.8rem; margin-bottom: 1.5rem; text-align: center;">🎮 Next Level Unlocks</h4>
+            <div style="max-width: 700px; margin: 0 auto;">
+                {% for suggestion in portfolio.ai_usage_breakdown.improvement_suggestions %}
+                <div class="unlock-card">
+                    <span class="unlock-icon">{% if suggestion.priority == 'maintain' %}🏆{% elif suggestion.priority == 'improve' %}⭐{% else %}🚀{% endif %}</span>
+                    <div style="display: inline-block; vertical-align: top; width: calc(100% - 4rem);">
+                        <div style="color: var(--neon-green); font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">
+                            {{ suggestion.area }}
+                        </div>
+                        <div style="color: var(--text-gray); font-size: 0.95rem;">
+                            {{ suggestion.suggestion }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if not portfolio.ai_usage_breakdown and github_data.ai_code_percentage is not None %}
+    <!-- Fallback to old display if breakdown not available -->
+    <h3 style="text-align: center; color: var(--neon-green); font-size: 2rem; margin: 3rem 0 2rem 0;">🤖 Code Intelligence Analysis</h3>
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; color: var(--neon-purple); font-weight: bold;">{{ github_data.ai_code_percentage }}%</div>
+                <div style="color: var(--text-gray);">🤖 AI-Assisted</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; color: var(--neon-green); font-weight: bold;">{{ github_data.human_code_percentage }}%</div>
+                <div style="color: var(--text-gray);">👨‍💻 Human-Written</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Career Stage & Job Readiness -->
+    {% if portfolio.career_assessment %}
+    <h3 style="text-align: center; color: var(--neon-green); font-size: 2rem; margin: 3rem 0 2rem 0;">🎯 Career Stage & Job Readiness</h3>
+    
+    <div style="max-width: 900px; margin: 0 auto;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Career Stage -->
+            <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">
+                    {% if portfolio.career_assessment.stage == 'expert' %}
+                        🏆
+                    {% else %}
+                        {% if portfolio.career_assessment.stage == 'advanced' %}
+                            🔥
+                        {% else %}
+                            {% if portfolio.career_assessment.stage == 'intermediate' %}
+                                ⚡
+                            {% else %}
+                                📚
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div style="font-size: 1.8rem; color: var(--neon-purple); font-weight: bold; text-transform: capitalize; margin-bottom: 0.5rem;">
+                    {{ portfolio.career_assessment.stage }}
+                </div>
+                <div style="color: var(--text-gray); font-size: 1rem;">
+                    Career Stage
+                </div>
+            </div>
+            
+            <!-- Job Readiness -->
+            <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem; text-align: center;">
+                <div style="font-size: 3rem; color: var(--neon-green); font-weight: bold; margin-bottom: 0.5rem;">
+                    {{ portfolio.job_readiness.overall_score }}
+                </div>
+                <div style="color: var(--text-gray); font-size: 1rem; margin-bottom: 0.5rem;">
+                    Job Readiness Score
+                </div>
+                <div style="color: var(--neon-green); font-size: 1.1rem; font-weight: bold;">
+                    {{ portfolio.job_readiness.readiness_level }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Evidence -->
+        {% if portfolio.career_assessment.evidence %}
+        <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 2rem;">
+            <h4 style="color: var(--neon-purple); font-size: 1.3rem; margin-bottom: 1rem;">📊 Career Stage Evidence:</h4>
+            <ul style="list-style: none; padding: 0; font-size: 1rem; line-height: 2;">
+                {% for evidence in portfolio.career_assessment.evidence %}
+                    <li style="margin: 0.5rem 0; color: var(--text-gray);">{{ evidence }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Strengths & Improvements -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <!-- Strengths -->
+            {% if portfolio.job_readiness.strengths %}
+            <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem;">
+                <h4 style="color: var(--neon-green); font-size: 1.3rem; margin-bottom: 1rem;">💪 Strengths:</h4>
+                <ul style="list-style: none; padding: 0; font-size: 0.95rem; line-height: 1.8;">
+                    {% for strength in portfolio.job_readiness.strengths %}
+                        <li style="margin: 0.5rem 0; color: var(--text-gray);">✅ {{ strength }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <!-- Areas for Improvement -->
+            {% if portfolio.job_readiness.areas_for_improvement %}
+            <div style="background: rgba(255, 193, 7, 0.05); border: 2px solid #ffc107; padding: 2rem;">
+                <h4 style="color: #ffc107; font-size: 1.3rem; margin-bottom: 1rem;">📈 Growth Areas:</h4>
+                <ul style="list-style: none; padding: 0; font-size: 0.95rem; line-height: 1.8;">
+                    {% for area in portfolio.job_readiness.areas_for_improvement %}
+                        <li style="margin: 0.5rem 0; color: var(--text-gray);">💡 {{ area }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Recommendations -->
+        {% if portfolio.job_readiness.recommendations %}
+        <div style="background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); padding: 2rem; margin-top: 2rem;">
+            <h4 style="color: var(--neon-green); font-size: 1.3rem; margin-bottom: 1rem;">🎯 Recommendations:</h4>
+            <ul style="list-style: none; padding: 0; font-size: 1rem; line-height: 2;">
+                {% for rec in portfolio.job_readiness.recommendations %}
+                    <li style="margin: 0.5rem 0; color: var(--text-gray);">{{ rec }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Skills Analysis -->
+    {% if portfolio.skills_analysis %}
+    <h3 style="text-align: center; color: var(--neon-green); font-size: 2rem; margin: 3rem 0 2rem 0;">🛠️ Skills Breakdown</h3>
+    
+    <div style="max-width: 900px; margin: 0 auto;">
+        <!-- Core Skills -->
+        {% if portfolio.skills_analysis.core_skills %}
+        <div style="margin-bottom: 2rem;">
+            <h4 style="color: var(--neon-green); font-size: 1.5rem; margin-bottom: 1rem; text-align: center;">🔥 Core Skills</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                {% for skill in portfolio.skills_analysis.core_skills %}
+                <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 1.5rem; color: var(--neon-green); font-weight: bold; margin-bottom: 0.5rem;">
+                        {{ skill.name }}
+                    </div>
+                    <div style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        Proficiency: {{ skill.proficiency }}%
+                    </div>
+                    {% if skill.human_developed %}
+                    <div style="color: var(--neon-green); font-size: 0.85rem;">
+                        👨‍💻 Human-developed
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Supporting Skills -->
+        {% if portfolio.skills_analysis.supporting_skills %}
+        <div style="margin-bottom: 2rem;">
+            <h4 style="color: var(--neon-purple); font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">⚡ Supporting Skills</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                {% for skill in portfolio.skills_analysis.supporting_skills %}
+                <div style="background: rgba(157, 78, 221, 0.1); border: 2px solid var(--neon-purple); padding: 1rem 1.5rem; border-radius: 25px;">
+                    <span style="color: var(--neon-purple); font-weight: bold;">{{ skill.name }}</span>
+                    <span style="color: var(--text-gray); font-size: 0.9rem;"> ({{ skill.proficiency }}%)</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Journey Timeline -->
+    {% if portfolio.journey %}
+    <h3 style="text-align: center; color: var(--neon-green); font-size: 2rem; margin: 3rem 0 2rem 0;">🚀 My Journey</h3>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <!-- Narrative -->
+        {% if portfolio.journey.narrative %}
+        <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 2rem; text-align: center;">
+            <p style="color: var(--text-gray); font-size: 1.1rem; line-height: 1.8; font-style: italic;">
+                "{{ portfolio.journey.narrative.intro }}"
+            </p>
+            <div style="margin-top: 1.5rem; color: var(--neon-green); font-size: 1rem;">
+                {{ portfolio.journey.narrative.current_state }}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Key Milestones -->
+        {% if portfolio.journey.key_milestones %}
+        <div style="margin-bottom: 2rem;">
+            <h4 style="color: var(--neon-green); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">🏆 Key Milestones</h4>
+            {% for milestone in portfolio.journey.key_milestones %}
+            <div style="background: rgba(57, 255, 20, 0.05); border-left: 4px solid var(--neon-green); padding: 1.5rem; margin-bottom: 1rem;">
+                <div style="color: var(--neon-green); font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem;">
+                    {{ milestone.title }}
+                </div>
+                <div style="color: var(--text-gray); font-size: 1rem; margin-bottom: 0.5rem;">
+                    {{ milestone.description }}
+                </div>
+                <div style="color: var(--neon-purple); font-size: 0.9rem;">
+                    💡 {{ milestone.impact }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Growth Metrics -->
+        {% if portfolio.journey.growth_metrics %}
+        <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem;">
+            <h4 style="color: var(--neon-purple); font-size: 1.3rem; margin-bottom: 1.5rem; text-align: center;">📈 Growth Over Time</h4>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+                <div>
+                    <div style="color: var(--neon-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Code Quality</div>
+                    <div style="color: var(--text-gray); font-size: 2rem; font-weight: bold;">
+                        {{ portfolio.journey.growth_metrics.code_quality_progression|last }}%
+                    </div>
+                </div>
+                <div>
+                    <div style="color: var(--neon-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Complexity</div>
+                    <div style="color: var(--text-gray); font-size: 2rem; font-weight: bold;">
+                        {{ portfolio.journey.growth_metrics.complexity_progression|last }}/10
+                    </div>
+                </div>
+                <div>
+                    <div style="color: var(--neon-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Skills</div>
+                    <div style="color: var(--text-gray); font-size: 2rem; font-weight: bold;">
+                        {{ portfolio.journey.growth_metrics.skill_count_progression|last }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Devpost Stats -->
+    {% if devpost_data and not devpost_data.error %}
+    <h2 class="section-title">🏆 Hackathon Legend</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ devpost_data.hackathons_participated }}</div>
+            <div class="stat-label">Hackathons</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ devpost_data.projects_submitted }}</div>
+            <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ devpost_data.wins }}</div>
+            <div class="stat-label">Wins 🏅</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ devpost_data.win_rate }}%</div>
+            <div class="stat-label">Win Rate</div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Social Links -->
+    <h2 class="section-title">🔗 Find Me</h2>
+    <div class="social-links">
+        {% if profile_user.github_link %}
+            <a href="{{ profile_user.github_link }}" target="_blank" class="social-link">
+                💻 GitHub
+            </a>
+        {% endif %}
+        {% if profile_user.linkedin_url %}
+            <a href="{{ profile_user.linkedin_url }}" target="_blank" class="social-link">
+                💼 LinkedIn
+            </a>
+        {% endif %}
+        {% if profile_user.devpost_url %}
+            <a href="{{ profile_user.devpost_url }}" target="_blank" class="social-link">
+                🏆 Devpost
+            </a>
+        {% endif %}
+    </div>
+    
+    <!-- Debug Info (only for own profile) -->
+    {% if is_own_profile and not github_data %}
+    <div style="background: rgba(255, 193, 7, 0.1); border: 2px solid #ffc107; padding: 2rem; margin: 2rem 0; text-align: center;">
+        <h3 style="color: #ffc107; margin-bottom: 1rem;">⚠️ GitHub Analysis Not Found</h3>
+        <p style="color: var(--text-gray); margin-bottom: 1rem;">
+            Your GitHub hasn't been analyzed yet. This could be because:
+        </p>
+        <ul style="list-style: none; padding: 0; color: var(--text-gray); line-height: 2;">
+            <li>❌ GitHub link not added</li>
+            <li>❌ Analysis failed (check GitHub username)</li>
+            <li>❌ Portfolio not refreshed after adding link</li>
+        </ul>
+        <div style="margin-top: 2rem;">
+            <a href="{% url 'haunt_setup' %}" class="haunted-button" style="text-decoration: none; display: inline-block;">
+                {% if profile_user.github_link %}
+                    🔄 Re-analyze GitHub
+                {% else %}
+                    ✏️ Add GitHub Link
+                {% endif %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- No Data Message -->
+    {% if not github_data and not devpost_data and not is_own_profile %}
+    <div class="no-data">
+        <p>👻 This ghost hasn't shared their haunting grounds yet...</p>
+    </div>
+    {% endif %}
+    
+    <!-- Edit Buttons -->
+    {% if is_own_profile %}
+    <div style="text-align: center; margin-top: 3rem; display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'tell_kiro_about_you' %}" class="haunted-button" style="display: inline-block; text-decoration: none;">
+            📝 Update My Journey & Skills
+        </a>
+        <a href="{% url 'haunt_setup' %}" class="haunted-button" style="display: inline-block; text-decoration: none;">
+            🔗 Update My Links & Refresh
+        </a>
+    </div>
+    {% endif %}
+    </div> <!-- End portfolio-content -->
+</div> <!-- End portfolio-container -->
+
+<script>
+// INSANE HAUNTED EFFECTS
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove all question marks from the page
+    function removeQuestionMarks() {
+        const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        
+        let node;
+        while (node = walker.nextNode()) {
+            if (node.nodeValue.includes('?')) {
+                node.nodeValue = node.nodeValue.replace(/\?/g, '');
+            }
+        }
+    }
+    removeQuestionMarks();
+    
+
+    
+    // Removed surprise ghost and lightning effects for better UX
+    
+    // Collapsible Sections
+    document.querySelectorAll('.collapsible-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const section = this.parentElement;
+            section.classList.toggle('open');
+        });
+    });
+    
+    // Open first section by default
+    const firstCollapsible = document.querySelector('.collapsible-section');
+    if (firstCollapsible) {
+        firstCollapsible.classList.add('open');
+    }
+    
+
+    
+    // Animate skill bars on page load
+    // Animate skill bars with correct percentages
+    const skillBars = document.querySelectorAll('.skill-bar-fill');
+    
+    setTimeout(() => {
+        skillBars.forEach((bar, index) => {
+            const dataWidth = bar.getAttribute('data-width');
+            const percentage = dataWidth ? parseInt(dataWidth) : (94 - (index * 5)); // 94, 89, 84, 79, 74
+            
+            bar.style.width = percentage + '%';
+            bar.textContent = percentage + '%';
+            
+            // Update percentage display
+            const percentageDisplay = document.querySelector(`.skill-percentage-${index}`);
+            if (percentageDisplay) {
+                let current = 0;
+                const interval = setInterval(() => {
+                    current += 2;
+                    if (current >= percentage) {
+                        current = percentage;
+                        clearInterval(interval);
+                    }
+                    percentageDisplay.textContent = current + '%';
+                }, 30);
+            }
+        });
+    }, 500);
+    
+    // Create Radar Chart for Skills
+    const radarCanvas = document.getElementById('skillsRadarChart');
+    if (radarCanvas) {
+        const ctx = radarCanvas.getContext('2d');
+        
+        {% if github_data.skills %}
+        const skills = [
+            {% for skill in github_data.skills|slice:":5" %}
+                '{{ skill }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        const skillData = [94, 85, 75, 70, 65]; // Example data
+        
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: skills,
+                datasets: [{
+                    label: 'Proficiency',
+                    data: skillData,
+                    backgroundColor: 'rgba(57, 255, 20, 0.2)',
+                    borderColor: 'rgba(57, 255, 20, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(157, 78, 221, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(57, 255, 20, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20,
+                            color: '#8B8B8B',
+                            backdropColor: 'transparent'
+                        },
+                        grid: {
+                            color: 'rgba(157, 78, 221, 0.3)'
+                        },
+                        pointLabels: {
+                            color: '#39FF14',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        {% endif %}
+    }
+    
+    // Animate speedometer needles
+    const needles = document.querySelectorAll('.speedometer-needle');
+    needles.forEach(needle => {
+        const rotation = needle.style.transform.match(/rotate\(([^)]+)\)/);
+        if (rotation) {
+            needle.style.transform = 'translate(-50%, -100%) rotate(-90deg)';
+            setTimeout(() => {
+                needle.style.transform = `translate(-50%, -100%) ${rotation[0]}`;
+            }, 500);
+        }
+    });
+    
+    // Generate contribution heatmap (simulated data)
+    const heatmapContainer = document.querySelector('.heatmap-container');
+    if (heatmapContainer) {
+        for (let i = 0; i < 365; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'heatmap-cell';
+            const level = Math.floor(Math.random() * 6); // 0-5
+            if (level > 0) {
+                cell.classList.add(`level-${level}`);
+            }
+            cell.title = `Day ${i + 1}`;
+            heatmapContainer.appendChild(cell);
+        }
+    }
+});
+</script>
+{% endblock %}

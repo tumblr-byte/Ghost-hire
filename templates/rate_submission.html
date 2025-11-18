@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rate Submission{% endblock %}
+
+{% block content %}
+<style>
+    .rate-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .rate-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .rate-header h1 {
+        font-size: 2.5rem;
+        color: #39FF14;
+        text-shadow: 0 0 20px #39FF14;
+        margin-bottom: 10px;
+    }
+    
+    .submission-info {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .developer-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .dev-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid #39FF14;
+    }
+    
+    .dev-info h2 {
+        color: #39FF14;
+        margin: 0 0 5px 0;
+    }
+    
+    .dev-info p {
+        color: #9D4EDD;
+        margin: 0;
+    }
+    
+    .opportunity-title {
+        color: #E0E0E0;
+        font-size: 1.3rem;
+        margin: 20px 0;
+        padding: 15px;
+        background: #0D0D0D;
+        border-left: 3px solid #9D4EDD;
+        border-radius: 5px;
+    }
+    
+    .submission-content {
+        margin: 20px 0;
+    }
+    
+    .content-section {
+        background: #0D0D0D;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    
+    .content-section h3 {
+        color: #9D4EDD;
+        margin-bottom: 10px;
+    }
+    
+    .content-section p, .content-section pre {
+        color: #E0E0E0;
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .content-section a {
+        color: #39FF14;
+        text-decoration: none;
+    }
+    
+    .content-section a:hover {
+        text-decoration: underline;
+    }
+    
+    .rate-form {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .form-section h3 {
+        color: #9D4EDD;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+    }
+    
+    /* Star Rating */
+    .star-rating {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+    }
+    
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+    
+    .star-rating label {
+        font-size: 3rem;
+        cursor: pointer;
+        color: #666;
+        transition: all 0.3s;
+    }
+    
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input[type="radio"]:checked ~ label {
+        color: #FFD700;
+        text-shadow: 0 0 20px #FFD700;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #E0E0E0;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+    
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        background: #0D0D0D;
+        border: 1px solid #9D4EDD;
+        border-radius: 8px;
+        color: #E0E0E0;
+        font-family: inherit;
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 15px 0;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: auto;
+    }
+    
+    .checkbox-group label {
+        margin: 0;
+        color: #E0E0E0;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+    }
+    
+    .submit-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.5);
+    }
+    
+    .info-box {
+        background: #0D0D0D;
+        border-left: 3px solid #39FF14;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+    }
+    
+    .info-box p {
+        color: #E0E0E0;
+        margin: 5px 0;
+    }
+</style>
+
+<div class="rate-container">
+    <div class="rate-header">
+        <h1>⭐ Rate Submission</h1>
+        <p style="color: #E0E0E0;">Provide feedback to help developers grow</p>
+    </div>
+    
+    <!-- Submission Info -->
+    <div class="submission-info">
+        <div class="developer-header">
+            <img src="{{ submission.invitation.developer.ghost_avatar.url }}" alt="{{ submission.invitation.developer.username }}" class="dev-avatar">
+            <div class="dev-info">
+                <h2>{{ submission.invitation.developer.username }}</h2>
+                <p>Submitted: {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
+            </div>
+        </div>
+        
+        <div class="opportunity-title">
+            <strong>Opportunity:</strong> {{ submission.invitation.opportunity.title }}
+        </div>
+        
+        <div class="submission-content">
+            {% if submission.github_link %}
+            <div class="content-section">
+                <h3>🔗 GitHub Repository</h3>
+                <p><a href="{{ submission.github_link }}" target="_blank">{{ submission.github_link }}</a></p>
+            </div>
+            {% endif %}
+            
+            {% if submission.code_text %}
+            <div class="content-section">
+                <h3>💻 Code Submission</h3>
+                <pre>{{ submission.code_text }}</pre>
+            </div>
+            {% endif %}
+            
+            {% if submission.files %}
+            <div class="content-section">
+                <h3>📁 Uploaded Files</h3>
+                <p><a href="{{ submission.files.url }}" target="_blank">Download Files</a></p>
+            </div>
+            {% endif %}
+            
+            {% if submission.notes %}
+            <div class="content-section">
+                <h3>📝 Developer Notes</h3>
+                <p>{{ submission.notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Rating Form -->
+    <form method="POST" class="rate-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3>⭐ Your Rating</h3>
+            <div class="star-rating">
+                <input type="radio" name="rating" value="5" id="star5" required>
+                <label for="star5">⭐</label>
+                <input type="radio" name="rating" value="4" id="star4">
+                <label for="star4">⭐</label>
+                <input type="radio" name="rating" value="3" id="star3">
+                <label for="star3">⭐</label>
+                <input type="radio" name="rating" value="2" id="star2">
+                <label for="star2">⭐</label>
+                <input type="radio" name="rating" value="1" id="star1">
+                <label for="star1">⭐</label>
+            </div>
+            <p style="color: #E0E0E0; font-size: 0.9rem;">Click on a star to rate (5 = Excellent, 1 = Needs Improvement)</p>
+        </div>
+        
+        <div class="form-section">
+            <h3>💬 Feedback</h3>
+            <div class="form-group">
+                <label for="feedback">Your feedback (optional but recommended)</label>
+                <textarea id="feedback" name="feedback" placeholder="What did they do well? What could be improved?"></textarea>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" name="public_feedback" id="public_feedback">
+                <label for="public_feedback">Show this feedback on their profile (helps them build credibility)</label>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>💡 Tip:</strong> Constructive feedback helps developers improve and builds trust with other companies!</p>
+        </div>
+        
+        <button type="submit" class="submit-btn">
+            ⭐ Submit Rating
+        </button>
+    </form>
+</div>
+
+<script>
+    // Reverse star order for proper hover effect
+    const stars = document.querySelectorAll('.star-rating label');
+    stars.forEach((star, index) => {
+        star.addEventListener('mouseenter', () => {
+            stars.forEach((s, i) => {
+                if (i >= index) {
+                    s.style.color = '#FFD700';
+                    s.style.textShadow = '0 0 20px #FFD700';
+                }
+            });
+        });
+        
+        star.addEventListener('mouseleave', () => {
+            const checked = document.querySelector('.star-rating input:checked');
+            stars.forEach((s, i) => {
+                if (!checked || i < Array.from(stars).indexOf(checked.previousElementSibling)) {
+                    s.style.color = '#666';
+                    s.style.textShadow = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

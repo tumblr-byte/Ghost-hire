@@ -1,0 +1,550 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ghost Hire - Where Dead Careers Come to Life{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="{% static 'images/favicon.png' %}">
+    <link rel="shortcut icon" type="image/jpeg" href="{% static 'images/favicon.png' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/haunted.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* ===== CLEAN ICON NAVIGATION ===== */
+        .haunted-nav {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(26, 26, 26, 0.98) 100%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 2px solid transparent;
+            border-image: linear-gradient(90deg, #9D4EDD, #39FF14, #9D4EDD) 1;
+            padding: 1.2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(157, 78, 221, 0.3);
+        }
+
+        /* Logo Styling */
+        .haunted-nav .logo {
+            height: 50px;
+            filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.6));
+            transition: all 0.3s ease;
+        }
+
+        .haunted-nav .logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 25px rgba(157, 78, 221, 1));
+        }
+
+        /* Navigation Links Container */
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Icon Links with Tooltip */
+        .nav-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), rgba(57, 255, 20, 0.05));
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 12px;
+            color: #E0E0E0;
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-icon:hover {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.3), rgba(57, 255, 20, 0.15));
+            border-color: #9D4EDD;
+            color: #39FF14;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(157, 78, 221, 0.4);
+        }
+
+        /* Tooltip */
+        .nav-icon::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background: linear-gradient(135deg, #9D4EDD, #7B2EBD);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.6);
+            z-index: 1000;
+        }
+
+        .nav-icon:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+            bottom: -50px;
+        }
+
+        /* Mode Toggle Button */
+        .mode-toggle {
+            padding: 0.6rem 1.2rem !important;
+            width: auto !important;
+            background: linear-gradient(135deg, #9D4EDD, #39FF14) !important;
+            color: #0D0D0D !important;
+            font-weight: 700;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .mode-toggle:hover {
+            transform: translateY(-3px) scale(1.02) !important;
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.6) !important;
+        }
+
+        /* Notification Bell */
+        .notification-bell {
+            position: relative;
+            display: inline-block;
+        }
+
+        .notification-bell .nav-icon {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(255, 68, 68, 0.2));
+        }
+
+        .notification-bell .nav-icon:hover {
+            animation: bellShake 0.5s ease;
+        }
+
+        @keyframes bellShake {
+            0%, 100% { transform: rotate(0deg) translateY(-3px); }
+            25% { transform: rotate(-10deg) translateY(-3px); }
+            75% { transform: rotate(10deg) translateY(-3px); }
+        }
+
+        /* Notification Count Badge */
+        .notification-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(135deg, #FF4444, #FF0066);
+            color: white;
+            border-radius: 50%;
+            padding: 3px 7px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            display: none;
+            border: 2px solid #0D0D0D;
+            box-shadow: 0 2px 10px rgba(255, 68, 68, 0.8);
+        }
+
+        .notification-count.has-notifications {
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 15px);
+            right: 0;
+            background: linear-gradient(135deg, #1A1A1A 0%, #0D0D0D 100%);
+            border: 2px solid #9D4EDD;
+            border-radius: 15px;
+            width: 380px;
+            max-height: 450px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 15px 50px rgba(157, 78, 221, 0.6);
+        }
+
+        .notification-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.3s ease;
+        }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar */
+        .notification-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-track {
+            background: rgba(13, 13, 13, 0.5);
+            border-radius: 10px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #9D4EDD, #39FF14);
+            border-radius: 10px;
+        }
+
+        /* Notification Header */
+        .notification-header {
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, #9D4EDD, #7B2EBD);
+            color: #FFFFFF;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 13px 13px 0 0;
+        }
+
+        /* Mark All Read Button */
+        .mark-all-read {
+            background: #0D0D0D;
+            color: #39FF14;
+            border: 1px solid #39FF14;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .mark-all-read:hover {
+            background: #39FF14;
+            color: #0D0D0D;
+            transform: scale(1.05);
+        }
+
+        /* Notification Items */
+        .notification-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(157, 78, 221, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover {
+            background: rgba(157, 78, 221, 0.1);
+        }
+
+        .notification-item.unread {
+            background: rgba(157, 78, 221, 0.15);
+            border-left: 3px solid #9D4EDD;
+        }
+
+        .notification-item h4 {
+            color: #39FF14;
+            margin: 0 0 5px 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .notification-item p {
+            color: #E0E0E0;
+            margin: 0 0 8px 0;
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .notification-item small {
+            color: #9D4EDD;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* No Notifications */
+        .no-notifications {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: #9D4EDD;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .haunted-nav {
+                padding: 1rem 1.5rem;
+            }
+            
+            .nav-links {
+                gap: 0.3rem;
+            }
+            
+            .nav-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+
+            .mode-toggle {
+                font-size: 0.8rem;
+                padding: 0.5rem 1rem !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .haunted-nav {
+                padding: 0.8rem 1rem;
+            }
+
+            .nav-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .notification-dropdown {
+                width: 320px;
+                right: -50px;
+            }
+
+            /* Hide tooltip on mobile */
+            .nav-icon::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EPIC HAUNTED DECORATIONS -->
+    <div class="fog-background"></div>
+    <div class="fog-layer"></div>
+    
+    <!-- Floating Ghosts -->
+    <img src="{% static 'images/cute_ghost.png' %}" class="floating-ghost top-left" alt="">
+    <img src="{% static 'images/ghost_3.png' %}" class="floating-ghost top-right" alt="">
+    <img src="{% static 'images/ghost2.png' %}" class="floating-ghost bottom-left" alt="">
+    
+    <!-- Skeleton Corner -->
+    <img src="{% static 'images/skeleton.png' %}" class="skeleton-corner bottom-right" alt="">
+    
+    <!-- Spider Web -->
+    <div class="spider-web"></div>
+    
+    
+   
+    
+    <!-- Navigation Bar -->
+    <nav class="haunted-nav">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'images/logo.png' %}" alt="Ghost Hire" class="logo">
+        </a>
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                {% if user.is_company %}
+                    <!-- Company Navigation -->
+                    <a href="{% url 'ghost_selector' %}" class="nav-icon" data-tooltip="Ghost Selector">
+                        <i class="fa-solid fa-ghost"></i>
+                    </a>
+                    <a href="{% url 'company_dashboard' %}" class="nav-icon" data-tooltip="My Opportunities">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </a>
+                    <a href="{% url 'create_opportunity' %}" class="nav-icon" data-tooltip="Create Opportunity">
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </a>
+                    <div class="notification-bell">
+                        <a href="#" id="notificationBell" class="nav-icon" data-tooltip="Notifications">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="notification-count">0</span>
+                        </a>
+                    </div>
+                {% else %}
+                    <!-- Developer Navigation -->
+                    <a href="{% url 'haunted_portfolio' %}" class="nav-icon" data-tooltip="Portfolio">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </a>
+                    <a href="{% url 'my_invitations' %}" class="nav-icon" data-tooltip="My Invitations">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                    <a href="{% url 'ghost_hunt' %}" class="nav-icon" data-tooltip="Ghost Hunt">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
+                    <a href="{% url 'my_crews' %}" class="nav-icon" data-tooltip="My Crews">
+                        <i class="fa-solid fa-user-group"></i>
+                    </a>
+                    <div class="notification-bell">
+                        <a href="#" id="notificationBell" class="nav-icon" data-tooltip="Notifications">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="notification-count">0</span>
+                        </a>
+                    </div>
+                {% endif %}
+                <!-- Mode Toggle -->
+                <a href="{% url 'toggle_company_mode' %}" class="nav-icon mode-toggle" data-tooltip="Switch Mode">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    {% if user.is_company %}Developer{% else %}Company{% endif %}
+                </a>
+                <a href="{% url 'logout' %}" class="nav-icon" data-tooltip="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            {% else %}
+                <a href="{% url 'workos_login' %}" class="nav-icon mode-toggle" data-tooltip="Login">
+                    <i class="fa-solid fa-bolt"></i> Rise from the Grave
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <!-- Messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="page-transition">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Ghost Hire - Where Dead Careers Come to Life</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">No degree? No problem. Your skills will haunt the gatekeepers.</p>
+    </footer>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Notification Script -->
+    {% if user.is_authenticated %}
+    <script>
+        let notificationDropdown = null;
+        
+        function createNotificationDropdown() {
+            const dropdown = document.createElement('div');
+            dropdown.className = 'notification-dropdown';
+            dropdown.innerHTML = `
+                <div class="notification-header">
+                    <span>Notifications</span>
+                    <button class="mark-all-read" onclick="markAllRead()">Mark all read</button>
+                </div>
+                <div id="notificationList"></div>
+            `;
+            document.querySelector('.notification-bell').appendChild(dropdown);
+            return dropdown;
+        }
+        
+        function fetchNotifications() {
+            fetch('{% url "notifications_api" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.unread_count;
+                    const countElement = document.querySelector('.notification-count');
+                    
+                    if (count > 0) {
+                        countElement.textContent = count;
+                        countElement.classList.add('has-notifications');
+                    } else {
+                        countElement.classList.remove('has-notifications');
+                    }
+                    
+                    updateNotificationList(data.notifications);
+                });
+        }
+        
+        function updateNotificationList(notifications) {
+            const list = document.getElementById('notificationList');
+            if (!list) return;
+            
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="no-notifications">No notifications yet <i class="fa-solid fa-ghost"></i></div>';
+                return;
+            }
+            
+            list.innerHTML = notifications.map(n => `
+                <div class="notification-item ${n.is_read ? '' : 'unread'}" onclick="handleNotificationClick(${n.id}, '${n.link}')">
+                    <h4>${n.title}</h4>
+                    <p>${n.message}</p>
+                    <small>${n.created_at}</small>
+                </div>
+            `).join('');
+        }
+        
+        function handleNotificationClick(notificationId, link) {
+            fetch('{% url "notifications_api" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `action=mark_read&notification_id=${notificationId}`
+            }).then(() => {
+                if (link && link !== 'None') {
+                    window.location.href = link;
+                }
+                fetchNotifications();
+            });
+        }
+        
+        function markAllRead() {
+            fetch('{% url "notifications_api" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: 'action=mark_all_read'
+            }).then(() => {
+                fetchNotifications();
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            notificationDropdown = createNotificationDropdown();
+            
+            const bell = document.getElementById('notificationBell');
+            if (bell) {
+                bell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    notificationDropdown.classList.toggle('show');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.notification-bell')) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+            }
+            
+            fetchNotifications();
+            setInterval(fetchNotifications, 30000);
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

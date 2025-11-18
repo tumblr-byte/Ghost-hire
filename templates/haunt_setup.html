@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Drop Your Links - Ghost Hire{% endblock %}
+
+{% block extra_css %}
+<style>
+    .setup-container {
+        max-width: 700px;
+        margin: 4rem auto;
+        padding: 2rem;
+    }
+    
+    .setup-header {
+        text-align: center;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        animation: flicker 3s infinite;
+    }
+    
+    .setup-subtext {
+        text-align: center;
+        font-size: 1.3rem;
+        color: var(--neon-green);
+        margin-bottom: 3rem;
+        line-height: 1.6;
+    }
+    
+    .setup-form {
+        background: rgba(157, 78, 221, 0.05);
+        border: 2px solid var(--neon-purple);
+        padding: 2.5rem;
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        display: block;
+        color: var(--neon-purple);
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+        font-family: var(--font-header);
+    }
+    
+    .haunted-input {
+        width: 100%;
+        padding: 15px;
+        background: rgba(157, 78, 221, 0.1);
+        border: 2px solid var(--neon-purple);
+        color: var(--text-gray);
+        font-family: var(--font-body);
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .haunted-input:focus {
+        outline: none;
+        box-shadow: 0 0 15px var(--neon-green);
+        border-color: var(--neon-green);
+    }
+    
+    .avatar-upload {
+        margin-top: 1rem;
+    }
+    
+    .summon-button {
+        width: 100%;
+        margin-top: 2rem;
+        background: var(--neon-green);
+        font-size: 1.5rem;
+        padding: 20px;
+    }
+    
+    .summon-button:hover {
+        box-shadow: 0 0 5px var(--neon-green), 
+                    0 0 10px var(--neon-green), 
+                    0 0 20px var(--neon-green),
+                    0 0 40px var(--neon-green);
+    }
+    
+    .emoji-icon {
+        font-size: 2rem;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <h1 class="setup-header">Drop Your Links 🔗</h1>
+    <p class="setup-subtext">
+        No boring bios. Just drop your GitHub, LinkedIn, Devpost.<br>
+        Our AI will analyze your REAL skills. 🔥
+    </p>
+    
+    <form method="post" enctype="multipart/form-data" class="setup-form">
+        {% csrf_token %}
+        
+        <!-- GitHub -->
+        <div class="form-group">
+            <label class="form-label">
+                <span class="emoji-icon">💻</span> GitHub
+            </label>
+            {{ form.github_link }}
+        </div>
+        
+        <!-- LinkedIn -->
+        <div class="form-group">
+            <label class="form-label">
+                <span class="emoji-icon">💼</span> LinkedIn
+            </label>
+            {{ form.linkedin_url }}
+        </div>
+        
+        <!-- Devpost -->
+        <div class="form-group">
+            <label class="form-label">
+                <span class="emoji-icon">🏆</span> Devpost
+            </label>
+            {{ form.devpost_url }}
+        </div>
+        
+        <!-- Ghost Avatar -->
+        <div class="form-group">
+            <label class="form-label">
+                <span class="emoji-icon">👻</span> Your Ghost Avatar
+            </label>
+            <div class="avatar-upload">
+                {{ form.ghost_avatar }}
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">
+                Upload your spooky avatar or keep the default 👻
+            </p>
+        </div>
+        
+        <button type="submit" class="haunted-button summon-button">
+            🎃 Analyze My Skills 🎃
+        </button>
+        
+        <p style="text-align: center; margin-top: 1.5rem; color: var(--text-gray); font-size: 0.9rem;">
+            Our AI will scrape your profiles and show your REAL talent 🔮
+        </p>
+    </form>
+</div>
+{% endblock %}

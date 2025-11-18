@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Crew Invitations - Ghost Hire{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 3rem;">
+        ✉️ Crew Invitations ✉️
+    </h1>
+    
+    {% if invitations %}
+        {% for invitation in invitations %}
+        <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 style="color: var(--neon-green); font-size: 2rem; margin-bottom: 0.5rem;">
+                        {{ invitation.crew.name }}
+                    </h2>
+                    <p style="color: var(--text-gray);">
+                        Invited by <strong style="color: var(--neon-purple);">{{ invitation.from_user.username }}</strong>
+                    </p>
+                    <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.3rem;">
+                        {{ invitation.sent_at|timesince }} ago
+                    </p>
+                </div>
+                
+                <span style="background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 8px 20px; border-radius: 20px; font-weight: bold;">
+                    ⏳ Pending
+                </span>
+            </div>
+            
+            {% if invitation.crew.crew_bio %}
+            <div style="background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); padding: 1rem; margin-bottom: 1.5rem;">
+                <strong style="color: var(--neon-green);">About the Crew:</strong>
+                <p style="color: var(--text-gray); margin-top: 0.5rem;">{{ invitation.crew.crew_bio }}</p>
+            </div>
+            {% endif %}
+            
+            {% if invitation.message %}
+            <div style="background: rgba(157, 78, 221, 0.1); border-left: 3px solid var(--neon-purple); padding: 1rem; margin-bottom: 1.5rem;">
+                <strong style="color: var(--neon-purple);">Personal Message:</strong>
+                <p style="color: var(--text-gray); margin-top: 0.5rem;">{{ invitation.message }}</p>
+            </div>
+            {% endif %}
+            
+            <div style="margin-bottom: 1.5rem;">
+                <strong style="color: var(--neon-purple);">Current Members ({{ invitation.crew.members.count }}/5):</strong>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                    {% for member in invitation.crew.members.all %}
+                    <div style="text-align: center;">
+                        {% if member.ghost_avatar %}
+                            <img src="{{ member.ghost_avatar.url }}" alt="{{ member.username }}" 
+                                 style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-green);">
+                        {% endif %}
+                        <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.3rem;">
+                            {{ member.username }}
+                            {% if member == invitation.crew.created_by %}👑{% endif %}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <form method="post" action="{% url 'respond_to_invitation' invitation.id %}" style="display: flex; gap: 1rem;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="accept" 
+                        class="haunted-button" style="flex: 1; background: var(--neon-green); color: var(--bg-black);">
+                    ✅ Accept
+                </button>
+                <button type="submit" name="action" value="decline" 
+                        class="haunted-button" style="flex: 1; background: rgba(220, 53, 69, 0.3); border-color: #dc3545;">
+                    ❌ Decline
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 4rem; background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple);">
+            <p style="font-size: 1.5rem; color: var(--text-gray); margin-bottom: 2rem;">
+                👻 No pending invitations
+            </p>
+            <p style="color: var(--text-gray);">
+                Want to join a crew? Check out 
+                <a href="{% url 'ghost_hunt' %}" style="color: var(--neon-green);">Ghost Hunt</a> 
+                or 
+                <a href="{% url 'create_crew' %}" style="color: var(--neon-green);">create your own</a>!
+            </p>
+        </div>
+    {% endif %}
+    
+    <div style="text-align: center; margin-top: 3rem;">
+        <a href="{% url 'my_crews' %}" style="color: var(--neon-purple); text-decoration: none; font-size: 1.1rem;">
+            ← Back to My Crews
+        </a>
+    </div>
+</div>
+{% endblock %}

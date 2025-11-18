@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Tell Kiro About You - Ghost Hire{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 1rem;">
+        👻 Tell Kiro About You 👻
+    </h1>
+    
+    <p style="text-align: center; color: var(--neon-green); font-size: 1.3rem; margin-bottom: 1rem;">
+        Help Kiro understand your coding journey!
+    </p>
+    
+    <p style="text-align: center; color: var(--text-gray); font-size: 1.1rem; margin-bottom: 3rem;">
+        This helps our AI analyze your GitHub more accurately.<br>
+        We'll know what you're good at vs what you use AI help for! 🔥
+    </p>
+    
+    <form method="post" style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                What do you do? *
+            </label>
+            <input type="text" name="developer_role" required 
+                   placeholder="e.g., Computer Vision Developer, Full Stack Engineer, ML Researcher"
+                   value="{{ user.developer_role }}"
+                   style="width: 100%; padding: 12px; font-size: 1rem;">
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Your main role or what you specialize in
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Your Core Skills *
+            </label>
+            <textarea name="core_skills" required rows="3"
+                      placeholder="e.g., Object Detection, SGAN, PyTorch, TensorFlow, YOLO, OpenCV"
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.core_skills }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Technologies and skills you know well
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Your Strengths
+            </label>
+            <textarea name="strengths" rows="3"
+                      placeholder="e.g., ML algorithms, model optimization, backend systems, data pipelines"
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.strengths }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                What you're really good at
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-green); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                What You Use AI Help For
+            </label>
+            <textarea name="weaknesses" rows="3"
+                      placeholder="e.g., UI/UX design, Streamlit dashboards, CSS styling, documentation"
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.weaknesses }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Areas where you use AI as a helper (this is normal! 🔥)
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Your Coding Journey (optional)
+            </label>
+            <textarea name="coding_journey" rows="4"
+                      placeholder="e.g., Started with Python 2 years ago, now building CV models. Learning deployment..."
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.coding_journey }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Tell us about your journey and what you're learning
+            </p>
+        </div>
+        
+        <hr style="border: 1px solid var(--neon-purple); margin: 3rem 0; opacity: 0.3;">
+        
+        <h2 style="color: var(--neon-green); text-align: center; font-size: 2rem; margin-bottom: 2rem;">
+            🔥 Enhanced Portfolio Analysis 🔥
+        </h2>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Primary Expertise Area
+            </label>
+            <input type="text" name="expertise_area"
+                   placeholder="e.g., Computer Vision, Backend Engineering, Data Science"
+                   value="{{ user.expertise_area }}"
+                   style="width: 100%; padding: 12px; font-size: 1rem;">
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Your main area of expertise - helps us analyze your GitHub more accurately
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                What You Know in Your Expertise Area
+            </label>
+            <textarea name="expertise_details" rows="3"
+                      placeholder="e.g., Object detection with YOLO, image segmentation, real-time video processing..."
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.expertise_details }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Specific skills and knowledge in your expertise area
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Your Learning Journey
+            </label>
+            <textarea name="learning_journey" rows="4"
+                      placeholder="e.g., Started with basic Python, learned ML fundamentals, now specializing in CV..."
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.learning_journey }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                How you got here - your learning path and growth story
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-green); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Where You Use AI in Your Workflow
+            </label>
+            <textarea name="ai_usage_context" rows="3"
+                      placeholder="e.g., Use AI for UI/UX design, boilerplate code, documentation. Write core algorithms myself."
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.ai_usage_context }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Be honest! Smart developers use AI for the right things 🔥
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-green); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Areas Where You Rely on AI
+            </label>
+            <textarea name="non_expertise_areas" rows="3"
+                      placeholder="e.g., UI/UX, Streamlit apps, CSS styling, DevOps, documentation"
+                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.non_expertise_areas }}</textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Non-core areas where AI helps you - totally normal!
+            </p>
+        </div>
+        
+        <div style="background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); padding: 1.5rem; margin-bottom: 2rem;">
+            <h3 style="color: var(--neon-green); margin-bottom: 1rem;">Why This Helps:</h3>
+            <ul style="color: var(--text-gray); line-height: 2;">
+                <li>✅ AI knows your domain (CV, Web, Mobile, etc.)</li>
+                <li>✅ Understands what you code yourself vs use AI for</li>
+                <li>✅ Gives you accurate AI vs Human code analysis</li>
+                <li>✅ Shows employers you're self-aware about your skills</li>
+                <li>✅ Better job matching based on your strengths</li>
+                <li>✅ Career stage assessment (beginner/intermediate/advanced)</li>
+                <li>✅ Job readiness score with actionable feedback</li>
+            </ul>
+        </div>
+        
+        <button type="submit" class="haunted-button" style="width: 100%; font-size: 1.3rem;">
+            👻 Continue to Profile Setup 👻
+        </button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'haunt_setup' %}" style="color: var(--text-gray); text-decoration: none; font-size: 1rem;">
+            Skip for now →
+        </a>
+    </div>
+</div>
+{% endblock %}

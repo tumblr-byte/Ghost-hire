@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }} - Ghost Hire{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 900px;
+        margin: 4rem auto;
+        padding: 2rem;
+    }
+    
+    .profile-header {
+        background: rgba(157, 78, 221, 0.05);
+        border: 2px solid var(--neon-purple);
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+        margin-bottom: 2rem;
+    }
+    
+    .profile-avatar-wrapper {
+        margin-bottom: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        animation: float 3s ease-in-out infinite;
+        border-radius: 50%;
+        border: 4px solid var(--neon-green);
+        box-shadow: 0 0 30px var(--neon-green);
+    }
+    
+    .profile-username {
+        font-size: 2.5rem;
+        color: var(--neon-purple);
+        margin-bottom: 1rem;
+        animation: flicker 3s infinite;
+    }
+    
+    .profile-level {
+        font-size: 1.5rem;
+        color: var(--neon-purple);
+        margin-bottom: 1rem;
+    }
+    
+    .verified-badge {
+        display: inline-block;
+        background: var(--neon-green);
+        color: var(--bg-black);
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-top: 1rem;
+    }
+    
+    .profile-section {
+        background: rgba(157, 78, 221, 0.05);
+        border: 2px solid var(--neon-purple);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        color: var(--neon-green);
+        margin-bottom: 1.5rem;
+        font-family: var(--font-header);
+    }
+    
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .skill-pill {
+        background: var(--neon-purple);
+        color: var(--bg-black);
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 500;
+        box-shadow: 0 0 15px rgba(157, 78, 221, 0.6);
+    }
+    
+    .bio-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-gray);
+    }
+    
+    .github-link {
+        display: inline-block;
+        padding: 12px 24px;
+        background: rgba(57, 255, 20, 0.1);
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .github-link:hover {
+        box-shadow: 0 0 20px var(--neon-green);
+        transform: translateY(-3px);
+    }
+    
+    .no-content {
+        color: var(--text-gray);
+        font-style: italic;
+        opacity: 0.7;
+    }
+    
+    .edit-profile-btn {
+        margin-top: 2rem;
+        background: var(--neon-green);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar-wrapper">
+            {% if profile_user.ghost_avatar %}
+                <img src="{{ profile_user.ghost_avatar.url }}" alt="{{ profile_user.username }}" class="profile-avatar ghost-avatar">
+            {% else %}
+                <img src="{% static 'images/default-ghost.png' %}" alt="{{ profile_user.username }}" class="profile-avatar ghost-avatar">
+            {% endif %}
+        </div>
+        
+        <h1 class="profile-username">{{ profile_user.username }}</h1>
+        
+        <div class="profile-level">
+            <span class="star-rating">{{ stars }}</span>
+            <p style="font-size: 1rem; color: var(--text-gray); margin-top: 0.5rem;">
+                Ghost Level {{ profile_user.ghost_level }}
+            </p>
+        </div>
+        
+        {% if profile_user.is_verified %}
+            <span class="verified-badge">✅ Verified Ghost</span>
+        {% endif %}
+    </div>
+    
+    <!-- Skills Section -->
+    {% if profile_user.skills %}
+    <div class="profile-section">
+        <h2 class="section-title">Haunting Skills</h2>
+        <div class="skills-container">
+            {% for skill in profile_user.skills %}
+                <span class="skill-pill">{{ skill }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Bio Section -->
+    <div class="profile-section">
+        <h2 class="section-title">Ghost Story</h2>
+        {% if profile_user.bio %}
+            <p class="bio-text">{{ profile_user.bio }}</p>
+        {% else %}
+            <p class="no-content">This ghost hasn't shared their story yet...</p>
+        {% endif %}
+    </div>
+    
+    <!-- GitHub Section -->
+    {% if profile_user.github_link %}
+    <div class="profile-section">
+        <h2 class="section-title">Code Graveyard</h2>
+        <a href="{{ profile_user.github_link }}" target="_blank" class="github-link">
+            🔗 View GitHub Profile
+        </a>
+    </div>
+    {% endif %}
+    
+    <!-- Edit Profile Button (only for own profile) -->
+    {% if is_own_profile %}
+    <div style="text-align: center;">
+        <a href="{% url 'haunt_setup' %}" class="haunted-button edit-profile-btn">
+            ✏️ Edit Your Ghost
+        </a>
+    </div>
+    {% endif %}
+    
+    <!-- Profile Stats -->
+    <div class="profile-section" style="text-align: center;">
+        <p style="color: var(--text-gray); font-size: 0.9rem;">
+            Haunting since {{ profile_user.created_at|date:"F Y" }}
+        </p>
+    </div>
+</div>
+{% endblock %}

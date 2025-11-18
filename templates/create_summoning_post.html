@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Post a Job - Summoning Circle{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 2rem;">
+        🔮 Summon Talent 🔮
+    </h1>
+    
+    <form method="post" style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Company Name</label>
+            <input type="text" name="company_name" required placeholder="Your company" style="width: 100%; padding: 12px;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Job Title</label>
+            <input type="text" name="job_title" required placeholder="e.g. Junior Full Stack Developer" style="width: 100%; padding: 12px;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Description</label>
+            <textarea name="description" required placeholder="What will they do? What's the vibe?" rows="6" style="width: 100%; padding: 12px;"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Required Skills (comma-separated)</label>
+            <input type="text" name="required_skills" required placeholder="Python, React, Node.js" style="width: 100%; padding: 12px;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Location</label>
+            <input type="text" name="location" required placeholder="Remote / San Francisco / Hybrid" style="width: 100%; padding: 12px;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Salary Range (optional)</label>
+            <input type="text" name="salary_range" placeholder="$60k - $90k" style="width: 100%; padding: 12px;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="display: flex; align-items: center; color: var(--neon-green); font-size: 1.1rem;">
+                <input type="checkbox" name="is_remote" style="margin-right: 10px; width: 20px; height: 20px;">
+                🌍 Remote Position
+            </label>
+        </div>
+        
+        <button type="submit" class="haunted-button" style="width: 100%; font-size: 1.3rem;">
+            ✨ Summon Ghosts ✨
+        </button>
+    </form>
+</div>
+{% endblock %}

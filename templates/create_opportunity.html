@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Opportunity{% endblock %}
+
+{% block content %}
+<style>
+    .opportunity-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .opportunity-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .opportunity-header h1 {
+        font-size: 2.5rem;
+        color: #39FF14;
+        text-shadow: 0 0 20px #39FF14;
+        margin-bottom: 10px;
+    }
+    
+    .opportunity-form {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .form-section h3 {
+        color: #9D4EDD;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #E0E0E0;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        background: #0D0D0D;
+        border: 1px solid #9D4EDD;
+        border-radius: 8px;
+        color: #E0E0E0;
+        font-family: inherit;
+    }
+    
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    /* Opportunity Type Selection */
+    .type-selector {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .type-option {
+        position: relative;
+    }
+    
+    .type-option input[type="radio"] {
+        display: none;
+    }
+    
+    .type-label {
+        display: block;
+        background: #0D0D0D;
+        border: 2px solid #9D4EDD;
+        border-radius: 12px;
+        padding: 25px 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .type-label:hover {
+        border-color: #39FF14;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(57, 255, 20, 0.3);
+    }
+    
+    .type-option input[type="radio"]:checked + .type-label {
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        border-color: #39FF14;
+        color: #0D0D0D;
+    }
+    
+    .type-icon {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+    
+    .type-name {
+        font-weight: bold;
+        font-size: 1.1rem;
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .type-desc {
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+    
+    /* Type-specific fields (hidden by default) */
+    .type-fields {
+        display: none;
+        animation: fadeIn 0.3s;
+    }
+    
+    .type-fields.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: auto;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+    }
+    
+    .submit-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.5);
+    }
+    
+    .shortlist-preview {
+        background: #0D0D0D;
+        border: 1px solid #39FF14;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .shortlist-preview h4 {
+        color: #39FF14;
+        margin-bottom: 10px;
+    }
+    
+    .shortlist-preview p {
+        color: #E0E0E0;
+        margin: 5px 0;
+    }
+</style>
+
+<div class="opportunity-container">
+    <div class="opportunity-header">
+        <h1>✨ Create Opportunity</h1>
+        <p style="color: #E0E0E0;">Choose your opportunity type and invite developers</p>
+    </div>
+    
+    {% if shortlist %}
+    <div class="shortlist-preview">
+        <h4>📋 Shortlisted Developers ({{ shortlist_count }})</h4>
+        {% for dev in shortlist %}
+        <p>👻 {{ dev.username }}</p>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="shortlist-preview" style="border-color: #FF4444;">
+        <h4 style="color: #FF4444;">⚠️ No Developers Shortlisted</h4>
+        <p>Please go back to <a href="{% url 'ghost_selector' %}" style="color: #39FF14;">Ghost Selector</a> and add developers first.</p>
+    </div>
+    {% endif %}
+    
+    <form method="POST" enctype="multipart/form-data" class="opportunity-form" id="opportunityForm">
+        {% csrf_token %}
+        
+        <!-- Opportunity Type Selection -->
+        <div class="form-section">
+            <h3>Select Opportunity Type</h3>
+            <div class="type-selector">
+                <div class="type-option">
+                    <input type="radio" name="opportunity_type" value="paid_trial" id="paid_trial" required>
+                    <label for="paid_trial" class="type-label">
+                        <span class="type-icon">💰</span>
+                        <span class="type-name">Paid Trial</span>
+                        <span class="type-desc">Short paid project</span>
+                    </label>
+                </div>
+                
+                <div class="type-option">
+                    <input type="radio" name="opportunity_type" value="internship" id="internship">
+                    <label for="internship" class="type-label">
+                        <span class="type-icon">🎓</span>
+                        <span class="type-name">Internship</span>
+                        <span class="type-desc">1-6 month program</span>
+                    </label>
+                </div>
+                
+                <div class="type-option">
+                    <input type="radio" name="opportunity_type" value="skill_challenge" id="skill_challenge">
+                    <label for="skill_challenge" class="type-label">
+                        <span class="type-icon">⭐</span>
+                        <span class="type-name">Skill Challenge</span>
+                        <span class="type-desc">Test their skills</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Common Fields -->
+        <div class="form-section">
+            <h3>Basic Information</h3>
+            
+            <div class="form-group">
+                <label>Opportunity Title *</label>
+                <input type="text" name="title" required placeholder="e.g., Senior Backend Developer Trial">
+            </div>
+            
+            <div class="form-group">
+                <label>Description *</label>
+                <textarea name="description" required placeholder="Describe what the developer will do..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Required Skills *</label>
+                <input type="text" name="skills_needed" required placeholder="Python, Django, PostgreSQL (comma-separated)">
+            </div>
+            
+            <div class="form-group">
+                <label>Full Job Details (if successful)</label>
+                <textarea name="full_job_details" placeholder="What happens if they succeed? Full-time role details..."></textarea>
+            </div>
+        </div>
+        
+        <!-- Paid Trial Fields -->
+        <div id="paid_trial_fields" class="type-fields">
+            <div class="form-section">
+                <h3>💰 Paid Trial Details</h3>
+                
+                <div class="form-group">
+                    <label>Payment Amount (₹) *</label>
+                    <input type="number" name="payment" step="0.01" placeholder="15000">
+                </div>
+                
+                <div class="form-group">
+                    <label>Time Limit (hours) *</label>
+                    <input type="number" name="time_limit_hours" placeholder="40">
+                </div>
+                
+                <div class="form-group">
+                    <label>Success Criteria *</label>
+                    <textarea name="success_criteria" placeholder="What defines success for this trial?"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Internship Fields -->
+        <div id="internship_fields" class="type-fields">
+            <div class="form-section">
+                <h3>🎓 Internship Details</h3>
+                
+                <div class="form-group">
+                    <label>Duration (months) *</label>
+                    <input type="number" name="duration_months" min="1" max="6" placeholder="3">
+                </div>
+                
+                <div class="form-group">
+                    <label>Monthly Stipend (₹) *</label>
+                    <input type="number" name="stipend_amount" step="0.01" placeholder="10000 (or 0 if unpaid)">
+                </div>
+                
+                <div class="form-group">
+                    <label>Responsibilities *</label>
+                    <textarea name="responsibilities" placeholder="Day-to-day responsibilities..."></textarea>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="conversion_potential" id="conversion_potential">
+                    <label for="conversion_potential" style="margin: 0;">Can lead to full-time role</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Skill Challenge Fields -->
+        <div id="skill_challenge_fields" class="type-fields">
+            <div class="form-section">
+                <h3>⭐ Skill Challenge Details</h3>
+                
+                <div class="form-group">
+                    <label>Challenge Description *</label>
+                    <textarea name="challenge_description" placeholder="Describe the challenge..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Dataset/Requirements File</label>
+                    <input type="file" name="dataset_file">
+                </div>
+                
+                <div class="form-group">
+                    <label>Dataset/Requirements Link</label>
+                    <input type="url" name="dataset_link" placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Submission Deadline *</label>
+                    <input type="datetime-local" name="submission_deadline">
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="public_rating" id="public_rating">
+                    <label for="public_rating" style="margin: 0;">I will publicly rate all submissions</label>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="submit-btn">
+            🚀 Create & Send Invitations
+        </button>
+    </form>
+</div>
+
+<script>
+    // Show/hide type-specific fields based on selection
+    const typeRadios = document.querySelectorAll('input[name="opportunity_type"]');
+    const typeFields = {
+        'paid_trial': document.getElementById('paid_trial_fields'),
+        'internship': document.getElementById('internship_fields'),
+        'skill_challenge': document.getElementById('skill_challenge_fields')
+    };
+    
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Hide all type fields
+            Object.values(typeFields).forEach(field => {
+                field.classList.remove('active');
+            });
+            
+            // Show selected type fields
+            if (typeFields[this.value]) {
+                typeFields[this.value].classList.add('active');
+            }
+        });
+    });
+</script>
+{% endblock %}

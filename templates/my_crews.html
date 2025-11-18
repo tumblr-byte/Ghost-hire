@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}My Crews - Ghost Hire{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 3rem;">
+        👻 My Ghost Crews 👻
+    </h1>
+    
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <a href="{% url 'create_crew' %}" class="haunted-button" style="text-decoration: none;">
+            ✨ Create New Crew ✨
+        </a>
+        <a href="{% url 'ghost_hunt' %}" class="haunted-button" style="text-decoration: none; margin-left: 1rem;">
+            🔍 Hunt for Members
+        </a>
+        <a href="{% url 'crew_invitations' %}" class="haunted-button" style="text-decoration: none; margin-left: 1rem;">
+            ✉️ Invitations
+        </a>
+    </div>
+    
+    <!-- Crews I Created -->
+    {% if created_crews %}
+    <h2 style="color: var(--neon-green); font-size: 2rem; margin: 2rem 0 1rem 0;">🔥 Crews I Created</h2>
+    {% for crew in created_crews %}
+    <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <h3 style="color: var(--neon-green); font-size: 1.8rem; margin-bottom: 0.5rem;">{{ crew.name }}</h3>
+                <p style="color: var(--text-gray); margin-bottom: 1rem;">{{ crew.crew_bio|default:"No bio yet" }}</p>
+            </div>
+            <span style="background: var(--neon-purple); color: var(--bg-black); padding: 8px 15px; border-radius: 20px; font-weight: bold;">
+                👑 Creator
+            </span>
+        </div>
+        
+        <div style="margin: 1.5rem 0;">
+            <strong style="color: var(--neon-purple);">Members ({{ crew.members.count }}/5):</strong>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                {% for member in crew.members.all %}
+                <div style="text-align: center;">
+                    {% if member.ghost_avatar %}
+                        <img src="{{ member.ghost_avatar.url }}" alt="{{ member.username }}" 
+                             style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-green);">
+                    {% endif %}
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.3rem;">{{ member.username }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <a href="{% url 'crew_detail' crew.id %}" class="haunted-button" style="text-decoration: none; flex: 1; text-align: center;">
+                💬 Open Chat
+            </a>
+            {% if not crew.is_full %}
+            <a href="{% url 'ghost_hunt' %}" class="haunted-button" style="text-decoration: none; flex: 1; text-align: center;">
+                ➕ Add Members
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <!-- Crews I'm Part Of -->
+    {% if member_crews %}
+    <h2 style="color: var(--neon-green); font-size: 2rem; margin: 3rem 0 1rem 0;">👥 Crews I'm In</h2>
+    {% for crew in member_crews %}
+    <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--neon-green); font-size: 1.8rem; margin-bottom: 0.5rem;">{{ crew.name }}</h3>
+        <p style="color: var(--text-gray); margin-bottom: 1rem;">{{ crew.crew_bio|default:"No bio yet" }}</p>
+        <p style="color: var(--text-gray); font-size: 0.9rem;">Created by {{ crew.created_by.username }}</p>
+        
+        <div style="margin: 1.5rem 0;">
+            <strong style="color: var(--neon-green);">Members ({{ crew.members.count }}/5):</strong>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                {% for member in crew.members.all %}
+                <div style="text-align: center;">
+                    {% if member.ghost_avatar %}
+                        <img src="{{ member.ghost_avatar.url }}" alt="{{ member.username }}" 
+                             style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--neon-green);">
+                    {% endif %}
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.3rem;">{{ member.username }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <a href="{% url 'crew_detail' crew.id %}" class="haunted-button" style="text-decoration: none; display: inline-block;">
+            💬 Open Chat
+        </a>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <!-- No Crews -->
+    {% if not created_crews and not member_crews %}
+    <div style="text-align: center; padding: 4rem; background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple);">
+        <p style="font-size: 1.5rem; color: var(--text-gray); margin-bottom: 2rem;">
+            👻 You're not in any crews yet!
+        </p>
+        <a href="{% url 'create_crew' %}" class="haunted-button" style="display: inline-block; text-decoration: none; margin-right: 1rem;">
+            ✨ Create a Crew
+        </a>
+        <a href="{% url 'ghost_hunt' %}" class="haunted-button" style="display: inline-block; text-decoration: none;">
+            🔍 Find Developers
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Submit Work{% endblock %}
+
+{% block content %}
+<style>
+    .submit-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .submit-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .submit-header h1 {
+        font-size: 2.5rem;
+        color: #39FF14;
+        text-shadow: 0 0 20px #39FF14;
+        margin-bottom: 10px;
+    }
+    
+    .opportunity-info {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .opportunity-info h2 {
+        color: #9D4EDD;
+        margin-bottom: 15px;
+    }
+    
+    .opportunity-info p {
+        color: #E0E0E0;
+        line-height: 1.6;
+        margin: 10px 0;
+    }
+    
+    .company-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #0D0D0D;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    
+    .company-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #39FF14;
+    }
+    
+    .company-name {
+        color: #39FF14;
+        font-weight: bold;
+    }
+    
+    .submit-form {
+        background: #1A1A1A;
+        border: 2px solid #9D4EDD;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .form-section h3 {
+        color: #9D4EDD;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #E0E0E0;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+    
+    .form-group input[type="file"],
+    .form-group input[type="url"],
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        background: #0D0D0D;
+        border: 1px solid #9D4EDD;
+        border-radius: 8px;
+        color: #E0E0E0;
+        font-family: inherit;
+    }
+    
+    .form-group textarea {
+        min-height: 150px;
+        resize: vertical;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .file-upload-area {
+        border: 2px dashed #9D4EDD;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        background: #0D0D0D;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .file-upload-area:hover {
+        border-color: #39FF14;
+        background: #1A1A1A;
+    }
+    
+    .file-upload-area p {
+        color: #E0E0E0;
+        margin: 10px 0;
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #9D4EDD, #39FF14);
+        color: #0D0D0D;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 20px;
+    }
+    
+    .submit-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.5);
+    }
+    
+    .info-box {
+        background: #0D0D0D;
+        border-left: 3px solid #39FF14;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+    }
+    
+    .info-box p {
+        color: #E0E0E0;
+        margin: 5px 0;
+    }
+    
+    .info-box strong {
+        color: #39FF14;
+    }
+</style>
+
+<div class="submit-container">
+    <div class="submit-header">
+        <h1>📤 Submit Your Work</h1>
+        <p style="color: #E0E0E0;">Show them what you've got!</p>
+    </div>
+    
+    <!-- Opportunity Info -->
+    <div class="opportunity-info">
+        <h2>{{ invitation.opportunity.title }}</h2>
+        
+        <div class="company-badge">
+            <img src="{{ invitation.opportunity.company.ghost_avatar.url }}" alt="{{ invitation.opportunity.company.username }}" class="company-avatar">
+            <span class="company-name">{{ invitation.opportunity.company.username }}</span>
+        </div>
+        
+        <p>{{ invitation.opportunity.description }}</p>
+        
+        {% if invitation.opportunity.success_criteria %}
+        <div class="info-box">
+            <p><strong>Success Criteria:</strong></p>
+            <p>{{ invitation.opportunity.success_criteria }}</p>
+        </div>
+        {% endif %}
+        
+        {% if invitation.opportunity.challenge_description %}
+        <div class="info-box">
+            <p><strong>Challenge:</strong></p>
+            <p>{{ invitation.opportunity.challenge_description }}</p>
+        </div>
+        {% endif %}
+        
+        {% if invitation.opportunity.dataset_link %}
+        <div class="info-box">
+            <p><strong>Dataset/Requirements:</strong></p>
+            <p><a href="{{ invitation.opportunity.dataset_link }}" target="_blank" style="color: #39FF14;">{{ invitation.opportunity.dataset_link }}</a></p>
+        </div>
+        {% endif %}
+        
+        {% if invitation.opportunity.submission_deadline %}
+        <div class="info-box">
+            <p><strong>⏰ Deadline:</strong> {{ invitation.opportunity.submission_deadline|date:"M d, Y H:i" }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Submission Form -->
+    <form method="POST" enctype="multipart/form-data" class="submit-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3>📁 Upload Files</h3>
+            <div class="form-group">
+                <label for="files">Upload your code, documents, or any files</label>
+                <div class="file-upload-area" onclick="document.getElementById('files').click()">
+                    <div class="upload-icon">📁</div>
+                    <p><strong>Click to upload files</strong></p>
+                    <p style="font-size: 0.9rem; opacity: 0.7;">ZIP files, code files, documents, etc.</p>
+                </div>
+                <input type="file" id="files" name="files" style="display: none;">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>💻 Code Submission</h3>
+            <div class="form-group">
+                <label for="code_text">Paste your code here (optional)</label>
+                <textarea id="code_text" name="code_text" placeholder="// Your code here..."></textarea>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>🔗 GitHub Repository</h3>
+            <div class="form-group">
+                <label for="github_link">GitHub repository link (optional)</label>
+                <input type="url" id="github_link" name="github_link" placeholder="https://github.com/username/repo">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>📝 Additional Notes</h3>
+            <div class="form-group">
+                <label for="notes">Any notes for the company? (optional)</label>
+                <textarea id="notes" name="notes" placeholder="Explain your approach, challenges faced, or anything else..."></textarea>
+            </div>
+        </div>
+        
+        <div class="info-box" style="border-color: #FFA500;">
+            <p style="color: #FFA500;"><strong>⚠️ Important:</strong></p>
+            <p>Make sure you've included at least one of: files, code, or GitHub link.</p>
+            <p>Once submitted, you cannot edit your submission.</p>
+        </div>
+        
+        <button type="submit" class="submit-btn">
+            🚀 Submit Work
+        </button>
+    </form>
+</div>
+
+<script>
+    // Show selected file name
+    document.getElementById('files').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name;
+        if (fileName) {
+            document.querySelector('.file-upload-area p strong').textContent = `Selected: ${fileName}`;
+        }
+    });
+</script>
+{% endblock %}

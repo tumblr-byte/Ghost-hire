@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications - Ghost Hire{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 3rem;">
+        👻 My Haunting Applications 👻
+    </h1>
+    
+    {% if applications %}
+        {% for app in applications %}
+        <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                    <h2 style="font-size: 2rem; color: var(--neon-green); margin-bottom: 0.5rem;">{{ app.job.job_title }}</h2>
+                    <p style="font-size: 1.2rem; color: var(--neon-purple);">at {{ app.job.company_name }}</p>
+                </div>
+                <div style="text-align: right;">
+                    {% if app.status == 'pending' %}
+                        <span style="background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 8px 20px; border-radius: 20px; font-weight: bold;">
+                            ⏳ Pending
+                        </span>
+                    {% elif app.status == 'reviewed' %}
+                        <span style="background: rgba(57, 255, 20, 0.2); color: var(--neon-green); padding: 8px 20px; border-radius: 20px; font-weight: bold;">
+                            👀 Reviewed
+                        </span>
+                    {% elif app.status == 'accepted' %}
+                        <span style="background: var(--neon-green); color: var(--bg-black); padding: 8px 20px; border-radius: 20px; font-weight: bold;">
+                            ✅ Accepted!
+                        </span>
+                    {% elif app.status == 'rejected' %}
+                        <span style="background: rgba(220, 53, 69, 0.2); color: #dc3545; padding: 8px 20px; border-radius: 20px; font-weight: bold;">
+                            ❌ Rejected
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <p style="color: var(--text-gray); margin: 1rem 0;">
+                📅 Applied {{ app.applied_at|timesince }} ago
+            </p>
+            
+            <div style="background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); padding: 1rem; margin: 1.5rem 0;">
+                <strong style="color: var(--neon-green);">Your Cover Message:</strong>
+                <p style="margin-top: 0.5rem; color: var(--text-gray);">{{ app.cover_message }}</p>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+                <a href="{% url 'summoning_circle' %}" style="color: var(--neon-purple); text-decoration: none;">
+                    View Job Details →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 4rem; background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple);">
+            <p style="font-size: 1.5rem; color: var(--text-gray); margin-bottom: 2rem;">
+                👻 You haven't haunted any jobs yet!
+            </p>
+            <a href="{% url 'summoning_circle' %}" class="haunted-button" style="display: inline-block; text-decoration: none;">
+                🔮 Browse Jobs
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

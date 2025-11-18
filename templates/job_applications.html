@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Applications for {{ job.job_title }} - Ghost Hire{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 1rem;">
+        👻 Ghosts Haunting This Job 👻
+    </h1>
+    
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h2 style="font-size: 2rem; color: var(--neon-green);">{{ job.job_title }}</h2>
+        <p style="font-size: 1.2rem; color: var(--neon-purple);">at {{ job.company_name }}</p>
+        <p style="color: var(--text-gray); margin-top: 1rem;">{{ applications|length }} application(s)</p>
+    </div>
+    
+    {% if applications %}
+        {% for app in applications %}
+        <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 2rem;">
+            <div style="display: grid; grid-template-columns: 150px 1fr; gap: 2rem;">
+                <!-- Applicant Avatar & Info -->
+                <div style="text-align: center;">
+                    {% if app.applicant.ghost_avatar %}
+                        <img src="{{ app.applicant.ghost_avatar.url }}" alt="{{ app.applicant.username }}" 
+                             style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--neon-green); box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);">
+                    {% endif %}
+                    <h3 style="color: var(--neon-green); margin-top: 1rem; font-size: 1.3rem;">{{ app.applicant.username }}</h3>
+                    {% if app.applicant.is_verified %}
+                        <span style="color: var(--neon-green); font-size: 0.9rem;">✅ Verified</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Application Details -->
+                <div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <span style="color: var(--text-gray); font-size: 0.9rem;">Applied {{ app.applied_at|timesince }} ago</span>
+                        <span style="margin-left: 1rem;">
+                            {% if app.status == 'pending' %}
+                                <span style="background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 5px 15px; border-radius: 15px; font-size: 0.9rem;">⏳ Pending</span>
+                            {% elif app.status == 'reviewed' %}
+                                <span style="background: rgba(57, 255, 20, 0.2); color: var(--neon-green); padding: 5px 15px; border-radius: 15px; font-size: 0.9rem;">👀 Reviewed</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div style="background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <strong style="color: var(--neon-green); font-size: 1.1rem;">Cover Message:</strong>
+                        <p style="margin-top: 0.5rem; color: var(--text-gray); line-height: 1.6;">{{ app.cover_message }}</p>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    {% if app.applicant.portfolio_data %}
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(157, 78, 221, 0.1); padding: 1rem; text-align: center; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; color: var(--neon-green); font-weight: bold;">
+                                {{ app.applicant.portfolio_data.github.public_repos|default:"0" }}
+                            </div>
+                            <div style="font-size: 0.9rem; color: var(--text-gray);">Repos</div>
+                        </div>
+                        <div style="background: rgba(157, 78, 221, 0.1); padding: 1rem; text-align: center; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; color: var(--neon-green); font-weight: bold;">
+                                {{ app.applicant.portfolio_data.github.total_stars|default:"0" }}
+                            </div>
+                            <div style="font-size: 0.9rem; color: var(--text-gray);">Stars</div>
+                        </div>
+                        <div style="background: rgba(157, 78, 221, 0.1); padding: 1rem; text-align: center; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; color: var(--neon-green); font-weight: bold;">
+                                {{ app.applicant.portfolio_data.github.human_code_percentage|default:"?" }}%
+                            </div>
+                            <div style="font-size: 0.9rem; color: var(--text-gray);">Original Code</div>
+                        </div>
+                        <div style="background: rgba(157, 78, 221, 0.1); padding: 1rem; text-align: center; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; color: var(--neon-green); font-weight: bold;">
+                                {{ app.applicant.portfolio_data.overall_score|default:"0" }}
+                            </div>
+                            <div style="font-size: 0.9rem; color: var(--text-gray);">Ghost Score</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Actions -->
+                    <div style="display: flex; gap: 1rem;">
+                        <a href="{% url 'haunted_portfolio' app.applicant.username %}" class="haunted-button" style="text-decoration: none; flex: 1; text-align: center;">
+                            👻 View Full Portfolio
+                        </a>
+                        {% if app.applicant.github_link %}
+                        <a href="{{ app.applicant.github_link }}" target="_blank" style="background: rgba(57, 255, 20, 0.1); border: 2px solid var(--neon-green); color: var(--neon-green); padding: 12px 24px; text-decoration: none; text-align: center; flex: 1;">
+                            💻 GitHub
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 4rem; background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple);">
+            <p style="font-size: 1.5rem; color: var(--text-gray);">
+                👻 No ghosts haunting yet... Share your job!
+            </p>
+        </div>
+    {% endif %}
+    
+    <div style="text-align: center; margin-top: 3rem;">
+        <a href="{% url 'summoning_circle' %}" style="color: var(--neon-purple); text-decoration: none; font-size: 1.1rem;">
+            ← Back to Jobs
+        </a>
+    </div>
+</div>
+{% endblock %}

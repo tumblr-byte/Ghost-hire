@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply to {{ job.job_title }} - Ghost Hire{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 3rem;">
+        👻 Haunt This Job 👻
+    </h1>
+    
+    <!-- Job Details -->
+    <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 3rem;">
+        <h2 style="font-size: 2.5rem; color: var(--neon-green); margin-bottom: 1rem;">{{ job.job_title }}</h2>
+        <p style="font-size: 1.3rem; color: var(--neon-purple); margin-bottom: 2rem;">at {{ job.company_name }}</p>
+        
+        <div style="margin: 1.5rem 0;">
+            {% if job.is_remote %}
+                <span style="background: var(--neon-green); color: var(--bg-black); padding: 8px 20px; border-radius: 20px; margin-right: 10px;">🌍 Remote</span>
+            {% endif %}
+            <span style="background: var(--neon-green); color: var(--bg-black); padding: 8px 20px; border-radius: 20px;">🎓 No Degree Required!</span>
+        </div>
+        
+        <p style="margin: 2rem 0; line-height: 1.8; font-size: 1.1rem;">{{ job.description }}</p>
+        
+        <div style="margin: 2rem 0;">
+            <strong style="color: var(--neon-purple); font-size: 1.2rem;">Skills Needed:</strong><br>
+            <div style="margin-top: 1rem;">
+                {% for skill in job.required_skills %}
+                    <span style="background: var(--neon-purple); color: var(--bg-black); padding: 8px 15px; border-radius: 15px; margin: 5px; display: inline-block;">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        
+        {% if job.salary_range %}
+        <p style="color: var(--neon-green); font-size: 1.2rem; margin: 1.5rem 0;">💰 {{ job.salary_range }}</p>
+        {% endif %}
+        
+        <p style="color: var(--text-gray); font-size: 1.1rem;">📍 {{ job.location }}</p>
+    </div>
+    
+    <!-- Application Form -->
+    <div style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem;">
+        <h3 style="color: var(--neon-green); font-size: 2rem; margin-bottom: 1.5rem;">Your Application</h3>
+        
+        <p style="margin-bottom: 2rem; color: var(--text-gray);">
+            Your portfolio will be automatically shared. Add a personal message below! 🔥
+        </p>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 2rem;">
+                <label style="color: var(--neon-green); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                    Why are you perfect for this? (Cover Message)
+                </label>
+                <textarea name="cover_message" required placeholder="Tell them why you're the ghost they need..." rows="8" style="width: 100%; padding: 15px; font-size: 1rem;"></textarea>
+            </div>
+            
+            <div style="background: rgba(157, 78, 221, 0.1); padding: 1.5rem; margin-bottom: 2rem; border-left: 3px solid var(--neon-purple);">
+                <p style="color: var(--neon-purple); font-weight: bold; margin-bottom: 0.5rem;">📊 Your Portfolio Will Include:</p>
+                <ul style="color: var(--text-gray); line-height: 2;">
+                    <li>✅ GitHub stats and projects</li>
+                    <li>✅ Skills and languages</li>
+                    <li>✅ AI usage analysis</li>
+                    <li>✅ Hackathon wins (if any)</li>
+                    <li>✅ All your social links</li>
+                </ul>
+            </div>
+            
+            <button type="submit" class="haunted-button" style="width: 100%; font-size: 1.5rem;">
+                👻 Submit Application 👻
+            </button>
+        </form>
+    </div>
+    
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'summoning_circle' %}" style="color: var(--neon-purple); text-decoration: none; font-size: 1.1rem;">
+            ← Back to Jobs
+        </a>
+    </div>
+</div>
+{% endblock %}

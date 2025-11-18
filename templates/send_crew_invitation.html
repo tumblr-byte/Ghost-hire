@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Invite {{ to_user.username }} - Ghost Hire{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 2rem;">
+        ✉️ Send Crew Invitation ✉️
+    </h1>
+    
+    <!-- User Info -->
+    <div style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem; margin-bottom: 2rem; text-align: center;">
+        {% if to_user.ghost_avatar %}
+            <img src="{{ to_user.ghost_avatar.url }}" alt="{{ to_user.username }}" 
+                 style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--neon-green); box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); margin-bottom: 1rem;">
+        {% endif %}
+        
+        <h2 style="color: var(--neon-green); font-size: 2rem; margin-bottom: 0.5rem;">{{ to_user.username }}</h2>
+        
+        {% if to_user.is_verified %}
+            <span style="color: var(--neon-green);">✅ Verified Ghost</span>
+        {% endif %}
+        
+        {% if to_user.bio %}
+        <p style="color: var(--text-gray); margin-top: 1rem;">{{ to_user.bio }}</p>
+        {% endif %}
+        
+        <div style="margin-top: 1.5rem;">
+            <a href="{% url 'haunted_portfolio_public' to_user.username %}" style="color: var(--neon-purple); text-decoration: none;">
+                👻 View Full Portfolio →
+            </a>
+        </div>
+    </div>
+    
+    <!-- Invitation Form -->
+    <form method="post" style="background: rgba(57, 255, 20, 0.05); border: 2px solid var(--neon-green); padding: 2rem;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-green); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Select Crew *
+            </label>
+            <select name="crew_id" required style="width: 100%; padding: 12px; font-size: 1rem;">
+                <option value="">Choose a crew...</option>
+                {% for crew in user_crews %}
+                    <option value="{{ crew.id }}">{{ crew.name }} ({{ crew.members.count }}/5 members)</option>
+                {% endfor %}
+            </select>
+            
+            {% if not user_crews %}
+            <p style="color: var(--text-gray); margin-top: 1rem;">
+                You don't have any crews yet! 
+                <a href="{% url 'create_crew' %}" style="color: var(--neon-green);">Create one first</a>
+            </p>
+            {% endif %}
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-green); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
+                Personal Message (optional)
+            </label>
+            <textarea name="message" placeholder="Hey! Want to join our crew? We're working on..." 
+                      rows="5" style="width: 100%; padding: 12px; font-size: 1rem;"></textarea>
+            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                Tell them why they'd be a great fit! 🔥
+            </p>
+        </div>
+        
+        {% if user_crews %}
+        <button type="submit" class="haunted-button" style="width: 100%; font-size: 1.3rem;">
+            👻 Send Invitation 👻
+        </button>
+        {% endif %}
+    </form>
+    
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'ghost_hunt' %}" style="color: var(--neon-purple); text-decoration: none; font-size: 1.1rem;">
+            ← Back to Ghost Hunt
+        </a>
+    </div>
+</div>
+{% endblock %}

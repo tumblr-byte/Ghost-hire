@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Bury a Project - The Graveyard{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="text-align: center; font-size: 3rem; animation: flicker 3s infinite; margin-bottom: 2rem;">
+        💀 Bury Your Project 💀
+    </h1>
+    
+    <form method="post" enctype="multipart/form-data" style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Project Title</label>
+            <input type="text" name="title" required placeholder="What did you build?" style="width: 100%; padding: 12px;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Description</label>
+            <textarea name="description" required placeholder="Tell us about it..." rows="5" style="width: 100%; padding: 12px;"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Code Snippet (optional)</label>
+            <textarea name="code_snippet" placeholder="Paste your code here..." rows="8" style="width: 100%; padding: 12px; font-family: monospace;"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Project Link (optional)</label>
+            <input type="url" name="project_link" placeholder="https://github.com/..." style="width: 100%; padding: 12px;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">Screenshot (optional)</label>
+            <input type="file" name="image" accept="image/*">
+        </div>
+        
+        <button type="submit" class="haunted-button" style="width: 100%; font-size: 1.3rem;">
+            🪦 Bury It 🪦
+        </button>
+    </form>
+</div>
+{% endblock %}
