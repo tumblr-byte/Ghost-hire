@@ -80,8 +80,8 @@ The basic site is now running. You'll see:
 Your `.env` file already has WorkOS credentials configured! The "Rise from the Grave" button should work.
 
 **WorkOS Configuration:**
-- Client ID: `client_01K9KSPA3JEWWA2R99437QVPEQ`
-- API Key: Already configured
+- Client ID: Get from WorkOS Dashboard (starts with `client_`)
+- API Key: Get from WorkOS Dashboard (starts with `sk_test_`)
 - Redirect URI: `http://localhost:8000/auth/callback/`
 
 Make sure this redirect URI is added in your WorkOS Dashboard under "Redirects".

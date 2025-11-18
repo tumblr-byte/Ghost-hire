@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Ghost Hire - Where Dead Careers Come to Life{% endblock %}</title>
+    <title>{% block title %}Ghost Hire - Your skills will haunt the gatekeepers.{% endblock %}</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="{% static 'images/favicon.png' %}">
@@ -32,6 +32,14 @@
             box-shadow: 0 8px 32px rgba(157, 78, 221, 0.3);
         }
 
+        /* Logo Container */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+
         /* Logo Styling */
         .haunted-nav .logo {
             height: 50px;
@@ -39,9 +47,48 @@
             transition: all 0.3s ease;
         }
 
-        .haunted-nav .logo:hover {
+        .logo-container:hover .logo {
             transform: scale(1.05);
             filter: drop-shadow(0 0 25px rgba(157, 78, 221, 1));
+        }
+
+        /* Brand Name */
+        .brand-name {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #9D4EDD 0%, #39FF14 50%, #9D4EDD 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+            letter-spacing: 2px;
+            animation: gradientShift 3s ease infinite;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .logo-container:hover .brand-name {
+            letter-spacing: 3px;
+            text-shadow: 0 0 40px rgba(157, 78, 221, 0.8), 0 0 60px rgba(57, 255, 20, 0.4);
+        }
+
+        /* Responsive Brand Name */
+        @media (max-width: 768px) {
+            .brand-name {
+                font-size: 1.4rem;
+                letter-spacing: 1px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand-name {
+                display: none;
+            }
         }
 
         /* Navigation Links Container */
@@ -356,8 +403,9 @@
     
     <!-- Navigation Bar -->
     <nav class="haunted-nav">
-        <a href="{% url 'index' %}">
+        <a href="{% url 'index' %}" class="logo-container">
             <img src="{% static 'images/logo.png' %}" alt="Ghost Hire" class="logo">
+            <span class="brand-name">GHOST HIRE</span>
         </a>
         <div class="nav-links">
             {% if user.is_authenticated %}
@@ -433,8 +481,8 @@
     
     <!-- Footer -->
     <footer>
-        <p>&copy; 2025 Ghost Hire - Where Dead Careers Come to Life</p>
-        <p style="font-size: 0.8rem; margin-top: 0.5rem;">No degree? No problem. Your skills will haunt the gatekeepers.</p>
+        <p>&copy; 2025 Ghost Hire -  Your skills will haunt the gatekeepers.</p>
+      
     </footer>
     
     {% block extra_js %}{% endblock %}

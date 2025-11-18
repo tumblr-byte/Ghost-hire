@@ -22,7 +22,7 @@ def verification(request):
     """Photo verification page"""
     # Redirect if already verified
     if request.user.is_verified:
-        return redirect('haunt_setup')
+        return redirect('tell_kiro_about_you')
     
     if request.method == 'POST' and request.FILES.get('verification_photo'):
         uploaded_file = request.FILES['verification_photo']
@@ -56,7 +56,7 @@ def verification(request):
             
             os.remove(temp_path)
             messages.success(request, '✅ Verified Ghost! Welcome to the cemetery.')
-            return redirect('haunt_setup')
+            return redirect('tell_kiro_about_you')
             
         except Exception as e:
             if os.path.exists(temp_path):
@@ -103,10 +103,6 @@ def haunt_setup(request):
     # Redirect to verification if not verified
     if not request.user.is_verified:
         return redirect('verification')
-    
-    # Redirect to self-description if not filled
-    if not request.user.developer_role and not request.GET.get('skip'):
-        return redirect('tell_kiro_about_you')
     
     if request.method == 'POST':
         form = ProfileSetupForm(request.POST, request.FILES, instance=request.user)

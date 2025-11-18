@@ -20,66 +20,7 @@
     <form method="post" style="background: rgba(157, 78, 221, 0.05); border: 2px solid var(--neon-purple); padding: 2rem;">
         {% csrf_token %}
         
-        <div style="margin-bottom: 2rem;">
-            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
-                What do you do? *
-            </label>
-            <input type="text" name="developer_role" required 
-                   placeholder="e.g., Computer Vision Developer, Full Stack Engineer, ML Researcher"
-                   value="{{ user.developer_role }}"
-                   style="width: 100%; padding: 12px; font-size: 1rem;">
-            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
-                Your main role or what you specialize in
-            </p>
-        </div>
-        
-        <div style="margin-bottom: 2rem;">
-            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
-                Your Core Skills *
-            </label>
-            <textarea name="core_skills" required rows="3"
-                      placeholder="e.g., Object Detection, SGAN, PyTorch, TensorFlow, YOLO, OpenCV"
-                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.core_skills }}</textarea>
-            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
-                Technologies and skills you know well
-            </p>
-        </div>
-        
-        <div style="margin-bottom: 2rem;">
-            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
-                Your Strengths
-            </label>
-            <textarea name="strengths" rows="3"
-                      placeholder="e.g., ML algorithms, model optimization, backend systems, data pipelines"
-                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.strengths }}</textarea>
-            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
-                What you're really good at
-            </p>
-        </div>
-        
-        <div style="margin-bottom: 2rem;">
-            <label style="color: var(--neon-green); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
-                What You Use AI Help For
-            </label>
-            <textarea name="weaknesses" rows="3"
-                      placeholder="e.g., UI/UX design, Streamlit dashboards, CSS styling, documentation"
-                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.weaknesses }}</textarea>
-            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
-                Areas where you use AI as a helper (this is normal! 🔥)
-            </p>
-        </div>
-        
-        <div style="margin-bottom: 2rem;">
-            <label style="color: var(--neon-purple); font-size: 1.2rem; display: block; margin-bottom: 0.5rem;">
-                Your Coding Journey (optional)
-            </label>
-            <textarea name="coding_journey" rows="4"
-                      placeholder="e.g., Started with Python 2 years ago, now building CV models. Learning deployment..."
-                      style="width: 100%; padding: 12px; font-size: 1rem;">{{ user.coding_journey }}</textarea>
-            <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">
-                Tell us about your journey and what you're learning
-            </p>
-        </div>
+    
         
         <hr style="border: 1px solid var(--neon-purple); margin: 3rem 0; opacity: 0.3;">
         

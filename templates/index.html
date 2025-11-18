@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Ghost Hire - Where Dead Careers Come to Life{% endblock %}
+{% block title %}Ghost Hire -  Your skills will haunt the gatekeepers.{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -282,10 +282,12 @@
     <img src="{% static 'images/ghost2.png' %}" class="hero-ghost right" alt="">
     
     <h1 class="hero-title">👻 Ghost Hire 👻</h1>
-    <p class="hero-tagline">
-        Where <span class="highlight">Dead Careers</span> Come to Life<br>
-        <span style="font-size: 1.2rem; color: var(--text-secondary);">No degree? No problem. Your skills will haunt the gatekeepers.</span>
-    </p>
+  <p class="hero-tagline">
+    Where <span class="highlight">Dead Careers</span> Come to Life<br>
+    <span style="font-size: 1.2rem; color: var(--text-secondary);">
+        Self-taught? Bootcamp grad? Career switcher? Your skills will haunt the gatekeepers.
+    </span>
+</p>
     <a href="{% url 'workos_login' %}" class="cta-button">
         Rise from the Grave
     </a>
@@ -296,56 +298,44 @@
     <img src="{% static 'images/pumpkin.jpg' %}" alt="🎃">
 </div>
 
-<!-- Mission Statement -->
-<div class="stats-section">
-    <div style="max-width: 800px; margin: 0 auto; text-align: center;">
-        <h2 style="font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 1.5rem; font-family: var(--font-header);">
-            👻 Our Haunted Mission
-        </h2>
-        <p style="font-size: 1.3rem; color: var(--text-primary); line-height: 1.8;">
-            We believe <span style="color: var(--accent-primary); font-weight: bold;">skills matter more than degrees</span>. 
-            Ghost Hire is where self-taught developers prove their worth through code, not credentials. 
-            <span style="color: var(--accent-secondary); font-weight: bold;">No gatekeepers. No degree requirements. Just pure talent.</span>
-        </p>
-    </div>
-</div>
+
 
 <!-- Features -->
 <div class="features">
     <div class="feature-card haunted-card-enhanced">
         <div class="feature-icon">👻</div>
         <h3 class="feature-title">Prove Your Skills</h3>
-        <p class="feature-description">Show what you can do, not where you studied. Your code speaks louder than any diploma. Build your haunted portfolio and let your work do the talking.</p>
+        <p class="feature-description">Show what you can build, not where you studied. Your code speaks for itself. Build your haunted portfolio and let your work do the talking.</p>
     </div>
     
     <div class="feature-card haunted-card-enhanced">
         <div class="feature-icon">🔮</div>
         <h3 class="feature-title">Verified Ghosts Only</h3>
-        <p class="feature-description">Our AI-powered verification ensures authentic developers. No bots, no fakes, just real talent. Face verification keeps the graveyard clean.</p>
+        <p class="feature-description">AI-powered verification ensures authentic developers. No bots, no fakes, just real talent. Face verification keeps our community trustworthy.</p>
     </div>
     
     <div class="feature-card haunted-card-enhanced">
         <div class="feature-icon">⚡</div>
         <h3 class="feature-title">Ghost Trials</h3>
-        <p class="feature-description">Companies invite you to paid trials, internships, and skill challenges. No applications, no rejections. Just invitations to prove yourself.</p>
+        <p class="feature-description">Companies invite you to paid trials, internships, and skill challenges. No endless applications. Just opportunities to prove yourself.</p>
     </div>
     
     <div class="feature-card haunted-card-enhanced">
         <div class="feature-icon">🎃</div>
         <h3 class="feature-title">Build Your Crew</h3>
-        <p class="feature-description">Form ghost crews with other developers. Haunt hackathons together, share knowledge, and grow your network in the shadows.</p>
+        <p class="feature-description">Form ghost crews with other developers. Collaborate on hackathons, share knowledge, and grow together in the shadows.</p>
     </div>
     
     <div class="feature-card haunted-card-enhanced">
         <div class="feature-icon">💀</div>
         <h3 class="feature-title">The Graveyard</h3>
-        <p class="feature-description">Post your projects and get honest feedback. No sugar-coating, just real developers helping you improve. Roasts that make you better.</p>
+        <p class="feature-description">Post your projects and get honest feedback from real developers. No fake praise, just constructive roasts that make you better.</p>
     </div>
     
     <div class="feature-card haunted-card-enhanced">
         <div class="feature-icon">🌙</div>
-        <h3 class="feature-title">Haunt the Industry</h3>
-        <p class="feature-description">Join a community of self-taught developers who are changing the game. Your skills will haunt the gatekeepers who said you needed a degree.</p>
+        <h3 class="feature-title">Join the Community</h3>
+        <p class="feature-description">Connect with developers who value skills over credentials. Whether self-taught, bootcamp, or degree holder - if you can code, you belong here.</p>
     </div>
 </div>
 
@@ -354,6 +344,9 @@
     <h2 style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 2rem; font-family: var(--font-header);">
         Ready to Haunt?
     </h2>
+    <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;">
+        Join developers who believe skills > credentials
+    </p>
     <a href="{% url 'workos_login' %}" class="cta-button">
         Join the Graveyard
     </a>

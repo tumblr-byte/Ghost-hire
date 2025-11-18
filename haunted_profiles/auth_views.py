@@ -64,13 +64,19 @@ def workos_callback(request):
         if 'workos_state' in request.session:
             del request.session['workos_state']
         
-        # Redirect based on verification status
+        # Skip verification - go straight to profile setup
+        # Auto-verify user for Railway deployment (no photo verification)
         if not user.is_verified:
-            messages.success(request, f'Welcome, {user.username}! Please verify your identity.')
-            return redirect('verification')
+            user.is_verified = True
+            user.save()
+        
+        # Redirect to profile setup if GitHub link not set, otherwise to profile
+        if not user.github_link:
+            messages.success(request, f'Welcome, {user.username}! Let\'s set up your profile.')
+            return redirect('tell_kiro_about_you')
         else:
             messages.success(request, f'Welcome back, {user.username}!')
-            return redirect('profile')
+            return redirect('haunted_portfolio')
             
     except Exception as e:
         logger.error(f"Error in WorkOS callback: {e}")
