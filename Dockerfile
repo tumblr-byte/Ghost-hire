@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for mysqlclient and Pillow
 RUN apt-get update && apt-get install -y \
     gcc \
     default-libmysqlclient-dev \
@@ -26,3 +26,15 @@ COPY . /app/
 
 # Create staticfiles directory
 RUN mkdir -p /app/staticfiles
+
+# Run migrations and collectstatic, then start gunicorn
+CMD python manage.py migrate --noinput && \
+    python manage.py collectstatic --noinput && \
+    echo "Starting gunicorn on port $PORT..." && \
+    gunicorn ghosthire.wsgi:application \
+    --bind 0.0.0.0:$PORT \
+    --workers 2 \
+    --timeout 120 \
+    --log-level info \
+    --access-logfile - \
+    --error-logfile -
