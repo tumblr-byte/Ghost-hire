@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ghosthire
+    env: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn ghosthire.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ALLOWED_HOSTS
+        value: .onrender.com,localhost
+      - key: DEBUG
+        value: False
