@@ -24,11 +24,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . /app/
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
+# Create staticfiles directory
+RUN mkdir -p /app/staticfiles
 
-# Expose port
-EXPOSE 8000
-
-# Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "ghosthire.wsgi:application"]
+# Run migrations and collectstatic, then start gunicorn
+CMD python manage.py migrate --noinput && \
+    python manage.py collectstatic --noinput && \
+    echo "Starting gunicorn on port $PORT..." && \
+    gunicorn ghosthire.wsgi:application \
+    --bind 0.0.0.0:$PORT \
+    --workers 2 \
+    --timeout 120 \
+    --log-level info \
+    --access-logfile - \
+    --error-logfile -
