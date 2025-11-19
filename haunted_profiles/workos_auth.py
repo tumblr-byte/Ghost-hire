@@ -28,12 +28,17 @@ def get_authorization_url(state=None):
     Returns:
         str: Authorization URL to redirect user to
     """
+    # Debug: Print the redirect URI being used
+    print(f"🔍 DEBUG: WORKOS_REDIRECT_URI = {settings.WORKOS_REDIRECT_URI}")
+    
     # Use WorkOS SSO with Google OAuth provider
     authorization_url = workos_client.sso.get_authorization_url(
         provider='GoogleOAuth',
         redirect_uri=settings.WORKOS_REDIRECT_URI,
         state=state or '',
     )
+    
+    print(f"🔍 DEBUG: Authorization URL = {authorization_url}")
     
     return authorization_url
 
@@ -107,3 +112,4 @@ def generate_unique_username():
     # Fallback: use timestamp if all random attempts fail
     import time
     return f"ghost_{int(time.time()) % 100000}"
+
