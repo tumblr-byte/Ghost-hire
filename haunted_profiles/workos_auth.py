@@ -29,16 +29,22 @@ def get_authorization_url(state=None):
         str: Authorization URL to redirect user to
     """
     # Debug: Print the redirect URI being used
-    print(f"🔍 DEBUG: WORKOS_REDIRECT_URI = {settings.WORKOS_REDIRECT_URI}")
+    redirect_uri = settings.WORKOS_REDIRECT_URI
+    print(f"=" * 80)
+    print(f"🔍 DEBUG: WORKOS_REDIRECT_URI = '{redirect_uri}'")
+    print(f"🔍 DEBUG: Length = {len(redirect_uri)}")
+    print(f"🔍 DEBUG: Repr = {repr(redirect_uri)}")
+    print(f"=" * 80)
     
     # Use WorkOS SSO with Google OAuth provider
     authorization_url = workos_client.sso.get_authorization_url(
         provider='GoogleOAuth',
-        redirect_uri=settings.WORKOS_REDIRECT_URI,
+        redirect_uri=redirect_uri,
         state=state or '',
     )
     
     print(f"🔍 DEBUG: Authorization URL = {authorization_url}")
+    print(f"=" * 80)
     
     return authorization_url
 
