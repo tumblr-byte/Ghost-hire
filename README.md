@@ -1,8 +1,6 @@
 # 👻 Ghost Hire - Haunted Hiring Platform
 
-**Where Dead Careers Come to Life!**
-
-A spooky-themed hiring platform for self-taught developers to prove their skills without degrees.
+A spooky-themed hiring platform for self-taught developers to prove their skills.
 
 ---
 
